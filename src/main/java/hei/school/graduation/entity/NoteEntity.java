@@ -36,7 +36,7 @@ public class NoteEntity {
   @JoinColumn(name = "saisie_par_id")
   private UserEntity enteredBy;
 
-  @Column(nullable = false, precision = 4, scale = 2)
+  @Column(name = "valeur", nullable = false, precision = 4, scale = 2)
   private BigDecimal value;
 
   @CreationTimestamp
