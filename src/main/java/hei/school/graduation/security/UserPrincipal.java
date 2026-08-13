@@ -11,52 +11,52 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class UserPrincipal implements UserDetails {
 
-    private final UserEntity entity;
+  private final UserEntity entity;
 
-    public UserPrincipal(UserEntity entity) {
-        this.entity = entity;
-    }
+  public UserPrincipal(UserEntity entity) {
+    this.entity = entity;
+  }
 
-    public UUID getId() {
-        return entity.getId();
-    }
+  public UUID getId() {
+    return entity.getId();
+  }
 
-    public UserRole getRole() {
-        return entity.getRole();
-    }
+  public UserRole getRole() {
+    return entity.getRole();
+  }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + entity.getRole().name()));
-    }
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(new SimpleGrantedAuthority("ROLE_" + entity.getRole().name()));
+  }
 
-    @Override
-    public String getPassword() {
-        return entity.getPassword();
-    }
+  @Override
+  public String getPassword() {
+    return entity.getPasswordHash();
+  }
 
-    @Override
-    public String getUsername() {
-        return entity.getEmail();
-    }
+  @Override
+  public String getUsername() {
+    return entity.getEmail();
+  }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
 
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
 }

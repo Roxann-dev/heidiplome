@@ -26,86 +26,95 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final ObjectMapper objectMapper;
+  private final CustomUserDetailsService userDetailsService;
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final ObjectMapper objectMapper;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+  }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
+  @Bean
+  public DaoAuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(userDetailsService);
+    provider.setPasswordEncoder(passwordEncoder());
+    return provider;
+  }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
-        return config.getAuthenticationManager();
-    }
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+      throws Exception {
+    return config.getAuthenticationManager();
+  }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(
-                        auth ->
-                                auth
-                                        .requestMatchers("/auth/**").permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/promotions/**").hasRole("ADMIN")
-                                        .requestMatchers(HttpMethod.GET, "/groups/*/students").hasRole("ADMIN")
-                                        .requestMatchers(HttpMethod.POST, "/semestres/*/groups").hasRole("ADMIN")
-                                        .requestMatchers(HttpMethod.POST, "/courses").hasRole("ADMIN")
-                                        .requestMatchers(HttpMethod.POST, "/courses/*/groups").hasRole("ADMIN")
-                                        .requestMatchers("/users/**").hasRole("ADMIN")
-                                        .requestMatchers("/teacher-course-assignments/**").hasRole("ADMIN")
-                                        .requestMatchers(HttpMethod.POST, "/courses/*/examens")
-                                        .hasAnyRole("ADMIN", "TEACHER")
-                                        .requestMatchers(HttpMethod.GET, "/examens/*/notes")
-                                        .hasAnyRole("ADMIN", "TEACHER")
-                                        .requestMatchers(HttpMethod.POST, "/examens/*/notes")
-                                        .hasAnyRole("ADMIN", "TEACHER")
-                                        .requestMatchers(HttpMethod.PATCH, "/notes/*")
-                                        .hasAnyRole("ADMIN", "TEACHER")
-                                        .requestMatchers(HttpMethod.GET, "/courses/**")
-                                        .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
-                                        .requestMatchers(HttpMethod.GET, "/notes/*/historique")
-                                        .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
-                                        .requestMatchers(HttpMethod.GET, "/students/*/releves/**")
-                                        .hasAnyRole("ADMIN", "STUDENT")
-                                        .requestMatchers(HttpMethod.POST, "/students/*/releve-pdf")
-                                        .hasAnyRole("ADMIN", "STUDENT")
-                                        .anyRequest().authenticated())
-                .authenticationProvider(authenticationProvider())
-                .exceptionHandling(
-                        eh ->
-                                eh.authenticationEntryPoint(
-                                                (req, res, ex) -> writeJsonError(res, HttpStatus.UNAUTHORIZED, "Non authentifié"))
-                                        .accessDeniedHandler(
-                                                (req, res, ex) -> writeJsonError(res, HttpStatus.FORBIDDEN, "Accès refusé")))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/auth/**")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/promotions/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/groups/*/students")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/semestres/*/groups")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/courses")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/courses/*/groups")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/users/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/teacher-course-assignments/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/courses/*/examens")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.GET, "/examens/*/notes")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.POST, "/examens/*/notes")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.PATCH, "/notes/*")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.GET, "/courses/**")
+                    .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
+                    .requestMatchers(HttpMethod.GET, "/notes/*/historique")
+                    .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
+                    .requestMatchers(HttpMethod.GET, "/students/*/releves/**")
+                    .hasAnyRole("ADMIN", "STUDENT")
+                    .requestMatchers(HttpMethod.POST, "/students/*/releve-pdf")
+                    .hasAnyRole("ADMIN", "STUDENT")
+                    .anyRequest()
+                    .authenticated())
+        .authenticationProvider(authenticationProvider())
+        .exceptionHandling(
+            eh ->
+                eh.authenticationEntryPoint(
+                        (req, res, ex) ->
+                            writeJsonError(res, HttpStatus.UNAUTHORIZED, "Non authentifié"))
+                    .accessDeniedHandler(
+                        (req, res, ex) ->
+                            writeJsonError(res, HttpStatus.FORBIDDEN, "Accès refusé")))
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+    return http.build();
+  }
 
-    private void writeJsonError(
-            jakarta.servlet.http.HttpServletResponse response, HttpStatus status, String message)
-            throws java.io.IOException {
-        response.setStatus(status.value());
-        response.setContentType("application/json");
-        response
-                .getWriter()
-                .write(
-                        objectMapper.writeValueAsString(
-                                Map.of(
-                                        "status", status.value(),
-                                        "message", message,
-                                        "timestamp", java.time.LocalDateTime.now().toString())));
-    }
+  private void writeJsonError(
+      jakarta.servlet.http.HttpServletResponse response, HttpStatus status, String message)
+      throws java.io.IOException {
+    response.setStatus(status.value());
+    response.setContentType("application/json");
+    response
+        .getWriter()
+        .write(
+            objectMapper.writeValueAsString(
+                Map.of(
+                    "status", status.value(),
+                    "message", message,
+                    "timestamp", java.time.LocalDateTime.now().toString())));
+  }
 }
