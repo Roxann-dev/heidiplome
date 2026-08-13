@@ -1,4 +1,7 @@
 package hei.school.graduation.repository;
 
-public class NoteRepository {
-}
+import hei.school.graduation.entity.NoteEntity;
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface NoteRepository extends JpaRepository<NoteEntity, UUID> {}
