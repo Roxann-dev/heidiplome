@@ -1,4 +1,4 @@
-package hei.school.graduation.Entity;
+package hei.school.graduation.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
