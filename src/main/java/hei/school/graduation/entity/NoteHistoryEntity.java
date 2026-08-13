@@ -37,6 +37,6 @@ public class NoteHistoryEntity {
   @JoinColumn(name = "modifie_par_id", nullable = false)
   private UserEntity modifiedBy;
 
-  @Column(nullable = false, columnDefinition = "TEXT")
+  @Column(name = "motif", nullable = false, columnDefinition = "TEXT")
   private String reason;
 }
