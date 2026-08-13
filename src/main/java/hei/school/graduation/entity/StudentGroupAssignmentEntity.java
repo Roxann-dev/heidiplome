@@ -19,22 +19,20 @@ import org.hibernate.annotations.UuidGenerator;
 @Builder
 public class StudentGroupAssignmentEntity {
 
-    @Id
-    @UuidGenerator
-    private UUID id;
+  @Id @UuidGenerator private UUID id;
 
-    @Column(name = "student_id", nullable = false)
-    private UUID studentId;
+  @Column(name = "student_id", nullable = false)
+  private UUID studentId;
 
-    @Column(name = "group_id", nullable = false)
-    private UUID groupId;
+  @Column(name = "group_id", nullable = false)
+  private UUID groupId;
 
-    @Column(name = "semestre_id", nullable = false)
-    private UUID semestreId;
+  @Column(name = "semestre_id", nullable = false)
+  private UUID semestreId;
 
-    @Column(name = "date_debut", nullable = false)
-    private LocalDate dateDebut;
+  @Column(name = "date_debut", nullable = false)
+  private LocalDate dateDebut;
 
-    @Column(name = "date_fin")
-    private LocalDate dateFin;
+  @Column(name = "date_fin")
+  private LocalDate dateFin;
 }
