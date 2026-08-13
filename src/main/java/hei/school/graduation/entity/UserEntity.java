@@ -1,4 +1,4 @@
-package hei.school.graduation.Entity;
+package hei.school.graduation.entity;
 
 import hei.school.graduation.model.Enum.UserRole;
 import jakarta.persistence.*;

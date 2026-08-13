@@ -1,6 +1,6 @@
 package hei.school.graduation.mapper;
 
-import hei.school.graduation.Entity.UserEntity;
+import hei.school.graduation.entity.UserEntity;
 import hei.school.graduation.model.User;
 import org.springframework.stereotype.Component;
 
