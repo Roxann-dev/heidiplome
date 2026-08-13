@@ -43,7 +43,23 @@ paths:
                 items:
                   $ref: "#/components/schemas/Promotion"
 
-  # DIPLOMES
+  /promotions/{promotionId}:
+    get:
+      tags: [Promotions]
+      summary: Détail d'une promotion
+      parameters:
+        - $ref: "#/components/parameters/PromotionId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Promotion"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # DIPLOMES (fonctionnalité 2 : export xlsx téléchargeable, sans email)
 
   /promotions/{promotionId}/diplomes/export:
     get:
@@ -74,6 +90,49 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /promotions/{promotionId}/diplomes:
+    get:
+      tags: [Diplomes]
+      summary: Consulter la liste des diplômés en JSON (aperçu avant export)
+      parameters:
+        - $ref: "#/components/parameters/PromotionId"
+        - name: parcours
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Parcours"
+      responses:
+        "200":
+          description: Liste triée par rang
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiplomeEntry"
+
+  /promotions/{promotionId}/resultats:
+    get:
+      tags: [Diplomes]
+      summary: Vue d'ensemble des résultats de TOUS les students d'une promotion sur les 3 ans (ADMIN)
+      description: >
+        Contrairement à /diplomes (qui ne liste que les étudiants éligibles au
+        diplôme), cet endpoint couvre l'ensemble de la promotion et indique le
+        statut de chacun (EN_COURS, DIPLOME, NON_DIPLOME), sa moyenne cumulée
+        depuis S1 et son parcours actuel le cas échéant.
+      parameters:
+        - $ref: "#/components/parameters/PromotionId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResultatStudent"
+
+
   # SEMESTRES
 
   /promotions/{promotionId}/semestres:
@@ -91,7 +150,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Semestre"
-
 
   # GROUPS
 
@@ -129,6 +187,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/Group"
 
+  /groups/{groupId}/students:
+    get:
+      tags: [Groups]
+      summary: Lister les students actuellement affectés à un group
+      parameters:
+        - $ref: "#/components/parameters/GroupId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudentGroupAssignment"
 
   # COURSES
 
@@ -168,6 +241,22 @@ paths:
               schema:
                 $ref: "#/components/schemas/Course"
 
+  /courses/{courseId}:
+    get:
+      tags: [Courses]
+      summary: Détail d'un course
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /courses/{courseId}/groups:
     post:
       tags: [Courses]
@@ -188,7 +277,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CourseGroupAssignment"
-
 
   # EXAMENS
 
@@ -235,12 +323,27 @@ paths:
               schema:
                 $ref: "#/components/schemas/Examen"
         "409":
-          description: Somme des coefficients > 1
+          description: Somme des coefficients NORMAL > 1 (ne s'applique pas à RATTRAPAGE)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /examens/{examenId}:
+    get:
+      tags: [Examens]
+      summary: Détail d'un examen
+      parameters:
+        - $ref: "#/components/parameters/ExamenId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Examen"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   # NOTES
 
@@ -317,7 +420,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/NoteHistory"
 
-
   # RELEVES
 
   /students/{studentId}/releves/semestres/{semestreId}:
@@ -377,7 +479,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/AsyncTaskAccepted"
 
-
   # USERS
 
   /users:
@@ -416,6 +517,24 @@ paths:
                 $ref: "#/components/schemas/User"
 
   /users/{userId}/group-assignments:
+    get:
+      tags: [Users]
+      summary: Historique complet des groups d'un student
+      description: >
+        Renvoie toutes les affectations de group d'un student, semestre par
+        semestre, y compris les périodes de tronc commun. C'est cet historique
+        qui garantit qu'aucune note n'est perdue lors d'un changement de group.
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudentGroupAssignment"
     post:
       tags: [Users]
       summary: Affecter un student à un group pour un semestre (ADMIN)
@@ -435,7 +554,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StudentGroupAssignment"
-
 
   # ASSIGNMENTS (teacher <-> course)
 
