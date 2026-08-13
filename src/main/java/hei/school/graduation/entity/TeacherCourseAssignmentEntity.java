@@ -18,16 +18,14 @@ import org.hibernate.annotations.UuidGenerator;
 @Builder
 public class TeacherCourseAssignmentEntity {
 
-    @Id
-    @UuidGenerator
-    private UUID id;
+  @Id @UuidGenerator private UUID id;
 
-    @Column(name = "teacher_id", nullable = false)
-    private UUID teacherId;
+  @Column(name = "teacher_id", nullable = false)
+  private UUID teacherId;
 
-    @Column(name = "course_id", nullable = false)
-    private UUID courseId;
+  @Column(name = "course_id", nullable = false)
+  private UUID courseId;
 
-    @Column(name = "annee_academique", nullable = false)
-    private int anneeAcademique;
+  @Column(name = "annee_academique", nullable = false)
+  private int anneeAcademique;
 }
