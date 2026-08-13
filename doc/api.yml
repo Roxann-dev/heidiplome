@@ -1,0 +1,819 @@
+openapi: 3.0.3
+info:
+  title: HEI - Gestion des diplômés (PROG4/SYS3)
+  description: >
+    API de gestion des notes, groupes, promotions et diplômés de HEI sur un
+    cursus de 3 ans (S1 à S6).
+  version: "1.0.0"
+
+servers:
+  - url:
+
+tags:
+  - name: Promotions
+  - name: Semestres
+  - name: Groups
+  - name: Courses
+  - name: Examens
+  - name: Notes
+  - name: Releves
+  - name: Diplomes
+  - name: Users
+  - name: Assignments
+
+security:
+  - bearerAuth: []
+
+paths:
+
+  # PROMOTIONS
+
+  /promotions:
+    get:
+      tags: [Promotions]
+      summary: Lister toutes les promotions
+      description: Accessible à ADMIN (et sert d'alimentation à la page Thymeleaf de listing).
+      responses:
+        "200":
+          description: Liste des promotions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Promotion"
+
+  /promotions/{promotionId}:
+    get:
+      tags: [Promotions]
+      summary: Détail d'une promotion
+      parameters:
+        - $ref: "#/components/parameters/PromotionId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Promotion"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+
+  # DIPLOMES
+
+  /promotions/{promotionId}/diplomes/export:
+    get:
+      tags: [Diplomes]
+      summary: Télécharger la liste des diplômés d'une promotion (xlsx)
+      description: >
+        Génère (ou régénère) un fichier xlsx trié par rang décroissant de moyenne
+        générale (rang, STD, nom, prénom, moyenne générale), le dépose sur S3,
+        et renvoie directement le contenu binaire au client (téléchargement
+        immédiat, sans passage par email). Un étudiant est éligible si sa
+        moyenne finale est ≥ 10 sur TOUS les cours suivis depuis S1.
+      parameters:
+        - $ref: "#/components/parameters/PromotionId"
+        - name: parcours
+          in: query
+          required: true
+          description: Filtre EL ou TN (les deux listes sont toujours séparées).
+          schema:
+            $ref: "#/components/schemas/Parcours"
+      responses:
+        "200":
+          description: Fichier xlsx
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /promotions/{promotionId}/diplomes:
+    get:
+      tags: [Diplomes]
+      summary: Consulter la liste des diplômés en JSON (aperçu avant export)
+      parameters:
+        - $ref: "#/components/parameters/PromotionId"
+        - name: parcours
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/Parcours"
+      responses:
+        "200":
+          description: Liste triée par rang
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiplomeEntry"
+
+
+  # SEMESTRES
+
+  /promotions/{promotionId}/semestres:
+    get:
+      tags: [Semestres]
+      summary: Lister les semestres d'une promotion
+      parameters:
+        - $ref: "#/components/parameters/PromotionId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Semestre"
+
+
+  # GROUPS
+
+  /semestres/{semestreId}/groups:
+    get:
+      tags: [Groups]
+      summary: Lister les groups d'un semestre
+      parameters:
+        - $ref: "#/components/parameters/SemestreId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Group"
+    post:
+      tags: [Groups]
+      summary: Créer un group pour un semestre (ADMIN)
+      parameters:
+        - $ref: "#/components/parameters/SemestreId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupCreateRequest"
+      responses:
+        "201":
+          description: Créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+
+  /groups/{groupId}/students:
+    get:
+      tags: [Groups]
+      summary: Lister les students actuellement affectés à un group
+      parameters:
+        - $ref: "#/components/parameters/GroupId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudentGroupAssignment"
+
+
+  # COURSES
+
+  /courses:
+    get:
+      tags: [Courses]
+      summary: Lister les courses (filtrable par semestre)
+      parameters:
+        - name: semestreId
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+    post:
+      tags: [Courses]
+      summary: Créer un course (ADMIN)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseCreateRequest"
+      responses:
+        "201":
+          description: Créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+
+  /courses/{courseId}/groups:
+    post:
+      tags: [Courses]
+      summary: Associer un course à un group pour un semestre (ADMIN)
+      description: Alimente course_group_assignment — garantit l'isolation des relevés.
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseGroupAssignmentCreateRequest"
+      responses:
+        "201":
+          description: Créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseGroupAssignment"
+
+
+  # EXAMENS
+
+  /courses/{courseId}/examens:
+    get:
+      tags: [Examens]
+      summary: Lister les examens d'un course
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Examen"
+    post:
+      tags: [Examens]
+      summary: Créer un examen pour un course (TEACHER assigné, ou ADMIN)
+      description: >
+        Rejeté (409) si la somme des coefficients des examens existants du
+        course dépasserait 1 avec ce nouvel examen.
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamenCreateRequest"
+      responses:
+        "201":
+          description: Créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Examen"
+        "409":
+          description: Somme des coefficients > 1
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+
+  # NOTES
+
+  /examens/{examenId}/notes:
+    get:
+      tags: [Notes]
+      summary: Lister les notes d'un examen (TEACHER assigné au course, ou ADMIN)
+      parameters:
+        - $ref: "#/components/parameters/ExamenId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Note"
+    post:
+      tags: [Notes]
+      summary: Saisir une note (TEACHER assigné au course, ou ADMIN)
+      parameters:
+        - $ref: "#/components/parameters/ExamenId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteCreateRequest"
+      responses:
+        "201":
+          description: Créée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+
+  /notes/{noteId}:
+    patch:
+      tags: [Notes]
+      summary: Modifier une note existante (réclamation)
+      description: >
+        Nécessite un motif obligatoire. L'ancienne valeur est automatiquement
+        archivée dans note_history avant écrasement.
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteUpdateRequest"
+      responses:
+        "200":
+          description: Note mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+
+  /notes/{noteId}/historique:
+    get:
+      tags: [Notes]
+      summary: Consulter l'historique des modifications d'une note
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteHistory"
+
+
+  # RELEVES
+
+  /students/{studentId}/releves/semestres/{semestreId}:
+    get:
+      tags: [Releves]
+      summary: Relevé de notes d'un student pour un semestre donné
+      description: >
+        Ne contient que les courses effectivement suivis par le group du
+        student pour ce semestre (isolation via course_group_assignment).
+        Marqué "provisoire" tant qu'un course n'est pas clôturé.
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+        - $ref: "#/components/parameters/SemestreId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReleveSemestre"
+
+  /students/{studentId}/releves/annees/{anneeCursus}:
+    get:
+      tags: [Releves]
+      summary: Relevé annuel d'un student (moyenne pondérée par crédits)
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+        - name: anneeCursus
+          in: path
+          required: true
+          schema:
+            type: integer
+            enum: [1, 2, 3]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReleveAnnuel"
+
+  /students/{studentId}/releve-pdf:
+    post:
+      tags: [Releves]
+      summary: Générer et envoyer par email le relevé complet en PDF (asynchrone)
+      description: >
+        Déclenche un traitement asynchrone (Poja Mailer + S3) : génération du
+        PDF, dépôt sur S3, puis envoi d'un email à l'utilisateur avec le lien.
+        Répond immédiatement en 202 sans attendre la fin du traitement.
+      parameters:
+        - $ref: "#/components/parameters/StudentId"
+      responses:
+        "202":
+          description: Traitement accepté, en cours
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AsyncTaskAccepted"
+
+
+  # USERS
+
+  /users:
+    get:
+      tags: [Users]
+      summary: Lister les users (ADMIN)
+      parameters:
+        - name: role
+          in: query
+          schema:
+            $ref: "#/components/schemas/Role"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      tags: [Users]
+      summary: Créer un user (ADMIN)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+      responses:
+        "201":
+          description: Créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{userId}/group-assignments:
+    post:
+      tags: [Users]
+      summary: Affecter un student à un group pour un semestre (ADMIN)
+      description: Alimente student_group_assignment — capture l'historique des changements de group.
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentGroupAssignmentCreateRequest"
+      responses:
+        "201":
+          description: Créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentGroupAssignment"
+
+
+  # ASSIGNMENTS (teacher <-> course)
+
+  /teacher-course-assignments:
+    post:
+      tags: [Assignments]
+      summary: Assigner un teacher à un course pour une année académique (ADMIN)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeacherCourseAssignmentCreateRequest"
+      responses:
+        "201":
+          description: Créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeacherCourseAssignment"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PromotionId:
+      name: promotionId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    SemestreId:
+      name: semestreId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    GroupId:
+      name: groupId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    CourseId:
+      name: courseId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    ExamenId:
+      name: examenId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    NoteId:
+      name: noteId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    StudentId:
+      name: studentId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    Role:
+      type: string
+      enum: [STUDENT, TEACHER, ADMIN]
+
+    Parcours:
+      type: string
+      enum: [EL, TN]
+
+    ExamenType:
+      type: string
+      enum: [NORMAL, RATTRAPAGE]
+
+    ErrorResponse:
+      type: object
+      properties:
+        status: { type: integer }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+
+    AsyncTaskAccepted:
+      type: object
+      properties:
+        taskId: { type: string, format: uuid }
+        message: { type: string, example: "Génération du relevé en cours, vous recevrez un email." }
+
+    Promotion:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        libelle: { type: string, example: "Promotion 2023" }
+        anneeEntree: { type: integer, example: 2023 }
+
+    Semestre:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        promotionId: { type: string, format: uuid }
+        numero: { type: integer, minimum: 1, maximum: 6 }
+        anneeCursus: { type: integer, minimum: 1, maximum: 3 }
+
+    Group:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        reference: { type: string, example: "K1" }
+        parcours:
+          allOf:
+            - $ref: "#/components/schemas/Parcours"
+          nullable: true
+        semestreId: { type: string, format: uuid }
+
+    GroupCreateRequest:
+      type: object
+      required: [reference]
+      properties:
+        reference: { type: string, example: "K1-EL" }
+        parcours:
+          allOf:
+            - $ref: "#/components/schemas/Parcours"
+          nullable: true
+
+    Course:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        referenceCs: { type: string, example: "PROG4" }
+        title: { type: string, example: "Programmation avancée" }
+        credits: { type: integer, example: 5 }
+        semestreId: { type: string, format: uuid }
+
+    CourseCreateRequest:
+      type: object
+      required: [referenceCs, title, credits, semestreId]
+      properties:
+        referenceCs: { type: string }
+        title: { type: string }
+        credits: { type: integer, minimum: 1 }
+        semestreId: { type: string, format: uuid }
+
+    CourseGroupAssignment:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        courseId: { type: string, format: uuid }
+        groupId: { type: string, format: uuid }
+        semestreId: { type: string, format: uuid }
+
+    CourseGroupAssignmentCreateRequest:
+      type: object
+      required: [groupId, semestreId]
+      properties:
+        groupId: { type: string, format: uuid }
+        semestreId: { type: string, format: uuid }
+
+    Examen:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        courseId: { type: string, format: uuid }
+        dateExamen: { type: string, format: date }
+        coefficient: { type: number, format: double, minimum: 0, maximum: 1, example: 0.33 }
+        type:
+          $ref: "#/components/schemas/ExamenType"
+
+    ExamenCreateRequest:
+      type: object
+      required: [dateExamen, coefficient]
+      properties:
+        dateExamen: { type: string, format: date }
+        coefficient: { type: number, format: double, minimum: 0, maximum: 1 }
+        type:
+          allOf:
+            - $ref: "#/components/schemas/ExamenType"
+          default: NORMAL
+
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        reference: { type: string, example: "STD-2023-014" }
+        lastName: { type: string }
+        firstName: { type: string }
+        email: { type: string, format: email }
+        role:
+          $ref: "#/components/schemas/Role"
+
+    UserCreateRequest:
+      type: object
+      required: [reference, lastName, firstName, email, role]
+      properties:
+        reference: { type: string }
+        lastName: { type: string }
+        firstName: { type: string }
+        email: { type: string, format: email }
+        role:
+          $ref: "#/components/schemas/Role"
+
+    Note:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        examenId: { type: string, format: uuid }
+        studentId: { type: string, format: uuid }
+        saisieParId: { type: string, format: uuid, nullable: true }
+        valeur: { type: number, format: double, minimum: 0, maximum: 20 }
+        dateSaisie: { type: string, format: date-time }
+
+    NoteCreateRequest:
+      type: object
+      required: [studentId, valeur]
+      properties:
+        studentId: { type: string, format: uuid }
+        valeur: { type: number, format: double, minimum: 0, maximum: 20 }
+
+    NoteUpdateRequest:
+      type: object
+      required: [valeur, motif]
+      properties:
+        valeur: { type: number, format: double, minimum: 0, maximum: 20 }
+        motif: { type: string, example: "Erreur de saisie, corrigée après réclamation." }
+
+    NoteHistory:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        noteId: { type: string, format: uuid }
+        ancienneValeur: { type: number, format: double }
+        dateModif: { type: string, format: date-time }
+        modifieParId: { type: string, format: uuid }
+        motif: { type: string }
+
+    StudentGroupAssignment:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        studentId: { type: string, format: uuid }
+        groupId: { type: string, format: uuid }
+        semestreId: { type: string, format: uuid }
+        dateDebut: { type: string, format: date }
+        dateFin: { type: string, format: date, nullable: true }
+
+    StudentGroupAssignmentCreateRequest:
+      type: object
+      required: [groupId, semestreId, dateDebut]
+      properties:
+        groupId: { type: string, format: uuid }
+        semestreId: { type: string, format: uuid }
+        dateDebut: { type: string, format: date }
+        dateFin: { type: string, format: date, nullable: true }
+
+    TeacherCourseAssignment:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        teacherId: { type: string, format: uuid }
+        courseId: { type: string, format: uuid }
+        anneeAcademique: { type: integer, example: 2026 }
+
+    TeacherCourseAssignmentCreateRequest:
+      type: object
+      required: [teacherId, courseId, anneeAcademique]
+      properties:
+        teacherId: { type: string, format: uuid }
+        courseId: { type: string, format: uuid }
+        anneeAcademique: { type: integer }
+
+    CourseNoteLine:
+      type: object
+      description: Ligne de relevé pour un course donné.
+      properties:
+        courseId: { type: string, format: uuid }
+        referenceCs: { type: string }
+        title: { type: string }
+        credits: { type: integer }
+        moyenne: { type: number, format: double, nullable: true }
+        statut:
+          type: string
+          enum: [PROVISOIRE, COMPLET]
+
+    ReleveSemestre:
+      type: object
+      properties:
+        studentId: { type: string, format: uuid }
+        semestreId: { type: string, format: uuid }
+        groupId: { type: string, format: uuid }
+        lignes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseNoteLine"
+        statutGlobal:
+          type: string
+          enum: [PROVISOIRE, COMPLET]
+
+    ReleveAnnuel:
+      type: object
+      properties:
+        studentId: { type: string, format: uuid }
+        anneeCursus: { type: integer }
+        moyenneGenerale: { type: number, format: double }
+        totalCredits: { type: integer }
+        lignes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseNoteLine"
+
+    DiplomeEntry:
+      type: object
+      properties:
+        rang: { type: integer }
+        std: { type: string, description: "Matricule de l'étudiant" }
+        nom: { type: string }
+        prenom: { type: string }
+        moyenneGenerale: { type: number, format: double }
