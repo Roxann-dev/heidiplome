@@ -1,6 +1,6 @@
 package hei.school.graduation.mapper;
 
-import hei.school.graduation.Entity.PromotionEntity;
+import hei.school.graduation.entity.PromotionEntity;
 import hei.school.graduation.model.Promotion;
 import org.springframework.stereotype.Component;
 

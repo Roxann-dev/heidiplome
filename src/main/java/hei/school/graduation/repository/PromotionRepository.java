@@ -1,6 +1,6 @@
 package hei.school.graduation.repository;
 
-import hei.school.graduation.Entity.PromotionEntity;
+import hei.school.graduation.entity.PromotionEntity;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
