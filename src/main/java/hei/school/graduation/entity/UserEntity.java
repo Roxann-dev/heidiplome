@@ -36,6 +36,9 @@ public class UserEntity {
   @Column(nullable = false, unique = true)
   private String email;
 
+  @Column(nullable = false)
+  private String password;
+
   @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   @Column(nullable = false, columnDefinition = "user_role")
   private UserRole role;
