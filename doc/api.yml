@@ -43,23 +43,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/Promotion"
 
-  /promotions/{promotionId}:
-    get:
-      tags: [Promotions]
-      summary: Détail d'une promotion
-      parameters:
-        - $ref: "#/components/parameters/PromotionId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Promotion"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
-
   # DIPLOMES
 
   /promotions/{promotionId}/diplomes/export:
@@ -90,28 +73,6 @@ paths:
                 format: binary
         "404":
           $ref: "#/components/responses/NotFound"
-
-  /promotions/{promotionId}/diplomes:
-    get:
-      tags: [Diplomes]
-      summary: Consulter la liste des diplômés en JSON (aperçu avant export)
-      parameters:
-        - $ref: "#/components/parameters/PromotionId"
-        - name: parcours
-          in: query
-          required: true
-          schema:
-            $ref: "#/components/schemas/Parcours"
-      responses:
-        "200":
-          description: Liste triée par rang
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/DiplomeEntry"
-
 
   # SEMESTRES
 
@@ -167,22 +128,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Group"
-
-  /groups/{groupId}/students:
-    get:
-      tags: [Groups]
-      summary: Lister les students actuellement affectés à un group
-      parameters:
-        - $ref: "#/components/parameters/GroupId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/StudentGroupAssignment"
 
 
   # COURSES
@@ -266,8 +211,14 @@ paths:
       tags: [Examens]
       summary: Créer un examen pour un course (TEACHER assigné, ou ADMIN)
       description: >
-        Rejeté (409) si la somme des coefficients des examens existants du
-        course dépasserait 1 avec ce nouvel examen.
+        Si type=NORMAL : rejeté (409) si la somme des coefficients des
+        examens NORMAL déjà existants pour ce course dépasserait 1 avec ce
+        nouvel examen. Si type=RATTRAPAGE : cette contrainte de somme ne
+        s'applique pas (le rattrapage a son propre coefficient, typiquement 1,
+        et remplace la moyenne des examens NORMAL au lieu de s'y additionner —
+        voir règle 7.3). Un seul RATTRAPAGE par course et par student est
+        autorisé ; la limite de 1 par student est appliquée au moment de la
+        saisie de la note, pas à la création de l'examen lui-même.
       parameters:
         - $ref: "#/components/parameters/CourseId"
       requestBody:
@@ -489,6 +440,29 @@ paths:
   # ASSIGNMENTS (teacher <-> course)
 
   /teacher-course-assignments:
+    get:
+      tags: [Assignments]
+      summary: Lister les assignations teacher/course (filtrable par teacher ou année)
+      description: >
+        Permet notamment à un TEACHER de retrouver la liste de ses propres
+        courses assignés — condition nécessaire à la règle "un teacher ne note
+        que ses propres matières".
+      parameters:
+        - name: teacherId
+          in: query
+          schema: { type: string, format: uuid }
+        - name: anneeAcademique
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeacherCourseAssignment"
     post:
       tags: [Assignments]
       summary: Assigner un teacher à un course pour une année académique (ADMIN)
@@ -817,3 +791,27 @@ components:
         nom: { type: string }
         prenom: { type: string }
         moyenneGenerale: { type: number, format: double }
+
+    StatutDiplome:
+      type: string
+      enum: [EN_COURS, DIPLOME, NON_DIPLOME]
+      description: >
+        EN_COURS = cursus pas encore terminé (< S6 clôturé) ;
+        DIPLOME = moyenne ≥ 10 sur tous les cours depuis S1 ;
+        NON_DIPLOME = cursus terminé mais au moins un cours < 10.
+
+    ResultatStudent:
+      type: object
+      description: Ligne de la vue d'ensemble ADMIN d'une promotion sur 3 ans.
+      properties:
+        studentId: { type: string, format: uuid }
+        std: { type: string, description: "Matricule de l'étudiant" }
+        nom: { type: string }
+        prenom: { type: string }
+        parcoursActuel:
+          allOf:
+            - $ref: "#/components/schemas/Parcours"
+          nullable: true
+        moyenneCumulee: { type: number, format: double }
+        statut:
+          $ref: "#/components/schemas/StatutDiplome"
