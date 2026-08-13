@@ -59,7 +59,8 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
-  # DIPLOMES (fonctionnalité 2 : export xlsx téléchargeable, sans email)
+
+  # DIPLOMES
 
   /promotions/{promotionId}/diplomes/export:
     get:
@@ -131,7 +132,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResultatStudent"
-
 
   # SEMESTRES
 
