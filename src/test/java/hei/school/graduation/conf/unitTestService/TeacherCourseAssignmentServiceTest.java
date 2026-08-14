@@ -54,7 +54,7 @@ class TeacherCourseAssignmentServiceTest {
 
     when(userRepository.findById(teacherId)).thenReturn(Optional.of(teacher));
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
-    when(teacherCourseAssignmentRepository.existsByTeacherIdAndCourseIdAndAnneeAcademique(
+    when(teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_IdAndAnneeAcademique(
             teacherId, courseId, anneeAcademique))
         .thenReturn(false);
     when(teacherCourseAssignmentRepository.save(any(TeacherCourseAssignmentEntity.class)))
@@ -62,8 +62,8 @@ class TeacherCourseAssignmentServiceTest {
 
     TeacherCourseAssignmentEntity result = service.assign(teacherId, courseId, anneeAcademique);
 
-    assertThat(result.getTeacherId()).isEqualTo(teacherId);
-    assertThat(result.getCourseId()).isEqualTo(courseId);
+    assertThat(result.getTeacher()).isEqualTo(teacherId);
+    assertThat(result.getCourse()).isEqualTo(courseId);
     assertThat(result.getAnneeAcademique()).isEqualTo(anneeAcademique);
     verify(teacherCourseAssignmentRepository).save(any(TeacherCourseAssignmentEntity.class));
   }
@@ -113,7 +113,7 @@ class TeacherCourseAssignmentServiceTest {
 
     when(userRepository.findById(teacherId)).thenReturn(Optional.of(teacher));
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
-    when(teacherCourseAssignmentRepository.existsByTeacherIdAndCourseIdAndAnneeAcademique(
+    when(teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_IdAndAnneeAcademique(
             teacherId, courseId, anneeAcademique))
         .thenReturn(true);
 

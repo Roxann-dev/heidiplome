@@ -8,13 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface TeacherCourseAssignmentRepository
     extends JpaRepository<TeacherCourseAssignmentEntity, UUID> {
 
-  List<TeacherCourseAssignmentEntity> findByTeacherId(UUID teacherId);
+  List<TeacherCourseAssignmentEntity> findByTeacher_Id(UUID teacherId);
 
-  List<TeacherCourseAssignmentEntity> findByTeacherIdAndAnneeAcademique(
+  List<TeacherCourseAssignmentEntity> findByTeacher_IdAndAnneeAcademique(
       UUID teacherId, int anneeAcademique);
 
-  boolean existsByTeacherIdAndCourseIdAndAnneeAcademique(
+  boolean existsByTeacher_IdAndCourse_IdAndAnneeAcademique(
       UUID teacherId, UUID courseId, int anneeAcademique);
 
-  boolean existsByTeacherIdAndCourseId(UUID teacherId, UUID courseId);
+  boolean existsByTeacher_IdAndCourse_Id(UUID teacherId, UUID courseId);
 }

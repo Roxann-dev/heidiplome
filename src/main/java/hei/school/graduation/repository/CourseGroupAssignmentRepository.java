@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CourseGroupAssignmentRepository
     extends JpaRepository<CourseGroupAssignmentEntity, UUID> {
 
-  List<CourseGroupAssignmentEntity> findByGroupId(UUID groupId);
+  List<CourseGroupAssignmentEntity> findByGroup_Id(UUID groupId);
 
-  List<CourseGroupAssignmentEntity> findByCourseId(UUID courseId);
+  List<CourseGroupAssignmentEntity> findByCourse_Id(UUID courseId);
 
-  boolean existsByCourseIdAndGroupId(UUID courseId, UUID groupId);
+  boolean existsByCourse_IdAndGroup_Id(UUID courseId, UUID groupId);
 }

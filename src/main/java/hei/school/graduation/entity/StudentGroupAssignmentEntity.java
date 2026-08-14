@@ -11,7 +11,9 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "student_group_assignment")
+@Table(
+    name = "student_group_assignment",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "semestre_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,14 +23,17 @@ public class StudentGroupAssignmentEntity {
 
   @Id @UuidGenerator private UUID id;
 
-  @Column(name = "student_id", nullable = false)
-  private UUID studentId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "student_id", nullable = false)
+  private UserEntity student;
 
-  @Column(name = "group_id", nullable = false)
-  private UUID groupId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "group_id", nullable = false)
+  private AcademicGroupEntity group;
 
-  @Column(name = "semestre_id", nullable = false)
-  private UUID semestreId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "semestre_id", nullable = false)
+  private SemesterEntity semestre;
 
   @Column(name = "date_debut", nullable = false)
   private LocalDate dateDebut;
