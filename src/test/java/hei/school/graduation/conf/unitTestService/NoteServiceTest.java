@@ -91,7 +91,7 @@ class NoteServiceTest {
     when(userRepository.findById(studentId)).thenReturn(Optional.of(student));
     when(teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_Id(teacherId, courseId))
         .thenReturn(true);
-    when(studentGroupAssignmentRepository.findByStudentIdAndSemestreId(studentId, semestreId))
+    when(studentGroupAssignmentRepository.findByStudent_IdAndSemestre_Id(studentId, semestreId))
         .thenReturn(Optional.of(studentGroupAssignment));
     when(courseGroupAssignmentRepository.existsByCourse_IdAndGroup_Id(courseId, groupId))
         .thenReturn(true);
@@ -163,7 +163,7 @@ class NoteServiceTest {
     when(userRepository.findById(studentId)).thenReturn(Optional.of(student));
     when(teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_Id(teacherId, courseId))
         .thenReturn(true);
-    when(studentGroupAssignmentRepository.findByStudentIdAndSemestreId(studentId, semestreId))
+    when(studentGroupAssignmentRepository.findByStudent_IdAndSemestre_Id(studentId, semestreId))
         .thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> service.saisir(examenId, studentId, valeur, teacherId))
@@ -179,7 +179,7 @@ class NoteServiceTest {
     when(userRepository.findById(studentId)).thenReturn(Optional.of(student));
     when(teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_Id(teacherId, courseId))
         .thenReturn(true);
-    when(studentGroupAssignmentRepository.findByStudentIdAndSemestreId(studentId, semestreId))
+    when(studentGroupAssignmentRepository.findByStudent_IdAndSemestre_Id(studentId, semestreId))
         .thenReturn(Optional.of(studentGroupAssignment));
     when(courseGroupAssignmentRepository.existsByCourse_IdAndGroup_Id(courseId, groupId))
         .thenReturn(false);
@@ -197,7 +197,7 @@ class NoteServiceTest {
     when(userRepository.findById(studentId)).thenReturn(Optional.of(student));
     when(teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_Id(teacherId, courseId))
         .thenReturn(true);
-    when(studentGroupAssignmentRepository.findByStudentIdAndSemestreId(studentId, semestreId))
+    when(studentGroupAssignmentRepository.findByStudent_IdAndSemestre_Id(studentId, semestreId))
         .thenReturn(Optional.of(studentGroupAssignment));
     when(courseGroupAssignmentRepository.existsByCourse_IdAndGroup_Id(courseId, groupId))
         .thenReturn(true);
