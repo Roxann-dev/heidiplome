@@ -62,8 +62,8 @@ class TeacherCourseAssignmentServiceTest {
 
     TeacherCourseAssignmentEntity result = service.assign(teacherId, courseId, anneeAcademique);
 
-    assertThat(result.getTeacher()).isEqualTo(teacherId);
-    assertThat(result.getCourse()).isEqualTo(courseId);
+    assertThat(result.getTeacher().getId()).isEqualTo(teacherId);
+    assertThat(result.getCourse().getId()).isEqualTo(courseId);
     assertThat(result.getAnneeAcademique()).isEqualTo(anneeAcademique);
     verify(teacherCourseAssignmentRepository).save(any(TeacherCourseAssignmentEntity.class));
   }
