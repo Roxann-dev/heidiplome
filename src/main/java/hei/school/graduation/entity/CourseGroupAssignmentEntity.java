@@ -10,7 +10,9 @@ import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
-@Table(name = "course_group_assignment")
+@Table(
+    name = "course_group_assignment",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"course_id", "group_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,12 +22,15 @@ public class CourseGroupAssignmentEntity {
 
   @Id @UuidGenerator private UUID id;
 
-  @Column(name = "course_id", nullable = false)
-  private UUID courseId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "course_id", nullable = false)
+  private CourseEntity course;
 
-  @Column(name = "group_id", nullable = false)
-  private UUID groupId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "group_id", nullable = false)
+  private AcademicGroupEntity group;
 
-  @Column(name = "semestre_id", nullable = false)
-  private UUID semestreId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "semestre_id", nullable = false)
+  private SemesterEntity semestre;
 }

@@ -38,7 +38,7 @@ public class TeacherCourseAssignmentService {
             .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
 
     boolean alreadyAssigned =
-        teacherCourseAssignmentRepository.existsByTeacherIdAndCourseIdAndAnneeAcademique(
+        teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_IdAndAnneeAcademique(
             teacherId, courseId, anneeAcademique);
     if (alreadyAssigned) {
       throw new ConflictException(
@@ -52,8 +52,8 @@ public class TeacherCourseAssignmentService {
 
     TeacherCourseAssignmentEntity assignment =
         TeacherCourseAssignmentEntity.builder()
-            .teacherId(teacher.getId())
-            .courseId(course.getId())
+            .teacher(teacher)
+            .course(course)
             .anneeAcademique(anneeAcademique)
             .build();
 
