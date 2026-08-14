@@ -32,7 +32,7 @@ public class AnnualAverageCalculator {
   public AnnualAverageResult compute(UUID studentId, int anneeCursus) {
     UUID promotionId = resolvePromotionId(studentId);
     List<SemesterEntity> semestres =
-        semesterRepository.findByPromotion_IdAndAnneeCursus(promotionId, anneeCursus);
+        semesterRepository.findByPromotion_IdAndCursusYear(promotionId, anneeCursus);
 
     BigDecimal sommePonderee = BigDecimal.ZERO;
     int totalCredits = 0;
