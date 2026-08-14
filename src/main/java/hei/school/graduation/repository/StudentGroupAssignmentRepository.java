@@ -9,12 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface StudentGroupAssignmentRepository
     extends JpaRepository<StudentGroupAssignmentEntity, UUID> {
 
-  List<StudentGroupAssignmentEntity> findByStudentIdOrderByDateDebutAsc(UUID studentId);
-
-  List<StudentGroupAssignmentEntity> findByGroupId(UUID groupId);
-
-  boolean existsByStudentIdAndSemestreId(UUID studentId, UUID semestreId);
-
-  Optional<StudentGroupAssignmentEntity> findByStudentIdAndSemestreId(
+  Optional<StudentGroupAssignmentEntity> findByStudent_IdAndSemestre_Id(
       UUID studentId, UUID semestreId);
+
+  List<StudentGroupAssignmentEntity> findByStudent_IdOrderByDateDebutAsc(UUID studentId);
+
+  List<StudentGroupAssignmentEntity> findByGroup_Id(UUID groupId);
+
+  boolean existsByStudent_IdAndSemestre_Id(UUID studentId, UUID semestreId);
 }
