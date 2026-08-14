@@ -39,7 +39,7 @@ public class CourseAverageCalculator {
     }
 
     List<UUID> examIds = exams.stream().map(ExamEntity::getId).toList();
-    List<NoteEntity> notes = noteRepository.findByStudentIdAndExamenIdIn(studentId, examIds);
+    List<NoteEntity> notes = noteRepository.findByStudent_IdAndExam_IdIn(studentId, examIds);
 
     Map<UUID, BigDecimal> valeurParExam =
         notes.stream().collect(Collectors.toMap(n -> n.getExam().getId(), NoteEntity::getValue));

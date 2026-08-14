@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NoteRepository extends JpaRepository<NoteEntity, UUID> {
-  List<NoteEntity> findByStudentIdAndExamenIdIn(UUID studentId, List<UUID> examenIds);
+  List<NoteEntity> findByStudent_IdAndExam_IdIn(UUID studentId, List<UUID> examenIds);
 
-  boolean existsByExamenIdAndStudentId(UUID examenId, UUID studentId);
+  boolean existsByExam_IdAndStudent_Id(UUID examenId, UUID studentId);
 }
