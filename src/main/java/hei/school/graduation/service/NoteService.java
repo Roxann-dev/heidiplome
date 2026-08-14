@@ -57,7 +57,7 @@ public class NoteService {
 
     StudentGroupAssignmentEntity studentGroupAssignment =
         studentGroupAssignmentRepository
-            .findByStudentIdAndSemestreId(studentId, semestreId)
+            .findByStudent_IdAndSemestre_Id(studentId, semestreId)
             .orElseThrow(
                 () ->
                     new BadRequestException(
