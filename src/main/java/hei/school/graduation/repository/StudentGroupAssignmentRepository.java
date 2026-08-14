@@ -2,6 +2,7 @@ package hei.school.graduation.repository;
 
 import hei.school.graduation.entity.StudentGroupAssignmentEntity;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,7 @@ public interface StudentGroupAssignmentRepository
   List<StudentGroupAssignmentEntity> findByGroupId(UUID groupId);
 
   boolean existsByStudentIdAndSemestreId(UUID studentId, UUID semestreId);
+
+  Optional<StudentGroupAssignmentEntity> findByStudentIdAndSemestreId(
+      UUID studentId, UUID semestreId);
 }
