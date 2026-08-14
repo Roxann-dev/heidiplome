@@ -18,45 +18,45 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class TeacherCourseAssignmentService {
 
-    private final UserRepository userRepository;
-    private final CourseRepository courseRepository;
-    private final TeacherCourseAssignmentRepository teacherCourseAssignmentRepository;
+  private final UserRepository userRepository;
+  private final CourseRepository courseRepository;
+  private final TeacherCourseAssignmentRepository teacherCourseAssignmentRepository;
 
-    public TeacherCourseAssignmentEntity assign(UUID teacherId, UUID courseId, int anneeAcademique) {
-        UserEntity teacher =
-                userRepository
-                        .findById(teacherId)
-                        .orElseThrow(() -> new NotFoundException("Teacher not found: " + teacherId));
+  public TeacherCourseAssignmentEntity assign(UUID teacherId, UUID courseId, int anneeAcademique) {
+    UserEntity teacher =
+        userRepository
+            .findById(teacherId)
+            .orElseThrow(() -> new NotFoundException("Teacher not found: " + teacherId));
 
-        if (teacher.getRole() != UserRole.TEACHER) {
-            throw new BadRequestException("User " + teacherId + " does not have role TEACHER");
-        }
-
-        CourseEntity course =
-                courseRepository
-                        .findById(courseId)
-                        .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
-
-        boolean alreadyAssigned =
-                teacherCourseAssignmentRepository.existsByTeacherIdAndCourseIdAndAnneeAcademique(
-                        teacherId, courseId, anneeAcademique);
-        if (alreadyAssigned) {
-            throw new ConflictException(
-                    "Teacher "
-                            + teacherId
-                            + " is already assigned to course "
-                            + courseId
-                            + " for year "
-                            + anneeAcademique);
-        }
-
-        TeacherCourseAssignmentEntity assignment =
-                TeacherCourseAssignmentEntity.builder()
-                        .teacherId(teacher.getId())
-                        .courseId(course.getId())
-                        .anneeAcademique(anneeAcademique)
-                        .build();
-
-        return teacherCourseAssignmentRepository.save(assignment);
+    if (teacher.getRole() != UserRole.TEACHER) {
+      throw new BadRequestException("User " + teacherId + " does not have role TEACHER");
     }
+
+    CourseEntity course =
+        courseRepository
+            .findById(courseId)
+            .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
+
+    boolean alreadyAssigned =
+        teacherCourseAssignmentRepository.existsByTeacherIdAndCourseIdAndAnneeAcademique(
+            teacherId, courseId, anneeAcademique);
+    if (alreadyAssigned) {
+      throw new ConflictException(
+          "Teacher "
+              + teacherId
+              + " is already assigned to course "
+              + courseId
+              + " for year "
+              + anneeAcademique);
+    }
+
+    TeacherCourseAssignmentEntity assignment =
+        TeacherCourseAssignmentEntity.builder()
+            .teacherId(teacher.getId())
+            .courseId(course.getId())
+            .anneeAcademique(anneeAcademique)
+            .build();
+
+    return teacherCourseAssignmentRepository.save(assignment);
+  }
 }
