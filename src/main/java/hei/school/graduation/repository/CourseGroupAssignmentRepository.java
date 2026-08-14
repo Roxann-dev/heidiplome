@@ -10,6 +10,8 @@ public interface CourseGroupAssignmentRepository
 
   List<CourseGroupAssignmentEntity> findByGroup_Id(UUID groupId);
 
+  List<CourseGroupAssignmentEntity> findByGroup_IdAndSemestre_Id(UUID groupId, UUID semestreId);
+
   List<CourseGroupAssignmentEntity> findByCourse_Id(UUID courseId);
 
   boolean existsByCourse_IdAndGroup_Id(UUID courseId, UUID groupId);
