@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class ExamenService {
+public class ExamService {
 
   private final CourseRepository courseRepository;
   private final ExamRepository examRepository;
