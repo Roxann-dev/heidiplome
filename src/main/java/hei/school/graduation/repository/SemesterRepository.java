@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface SemesterRepository extends JpaRepository<SemesterEntity, UUID> {
 
   List<SemesterEntity> findByPromotion_IdAndCursusYear(UUID promotionId, int cursusYear);
+
+  List<SemesterEntity> findByPromotion_IdOrderByNumeroAsc(UUID promotionId);
 }
