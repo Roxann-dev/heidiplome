@@ -1,6 +1,7 @@
 package hei.school.graduation.repository;
 
 import hei.school.graduation.entity.StudentGroupAssignmentEntity;
+import hei.school.graduation.model.Enum.Parcours;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,4 +18,7 @@ public interface StudentGroupAssignmentRepository
   List<StudentGroupAssignmentEntity> findByGroup_Id(UUID groupId);
 
   boolean existsByStudent_IdAndSemestre_Id(UUID studentId, UUID semestreId);
+
+  List<StudentGroupAssignmentEntity> findBySemestre_IdAndGroup_Parcours(
+      UUID semestreId, Parcours parcours);
 }
