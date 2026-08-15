@@ -16,26 +16,26 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DiplomeExportService {
 
-    private final DiplomeListService diplomeListService;
-    private final DiplomeExcelGenerator diplomeExcelGenerator;
-    private final BucketComponent bucketComponent;
+  private final DiplomeListService diplomeListService;
+  private final DiplomeExcelGenerator diplomeExcelGenerator;
+  private final BucketComponent bucketComponent;
 
-    public record ExportResult(byte[] fileBytes, String fileName) {}
+  public record ExportResult(byte[] fileBytes, String fileName) {}
 
-    public ExportResult exportToExcel(UUID promotionId, Parcours parcours) throws IOException {
-        List<DiplomeEntry> diplomes = diplomeListService.computeDiplomes(promotionId, parcours);
+  public ExportResult exportToExcel(UUID promotionId, Parcours parcours) throws IOException {
+    List<DiplomeEntry> diplomes = diplomeListService.computeDiplomes(promotionId, parcours);
 
-        String fileNameHint = "diplomes-" + parcours + "-" + promotionId;
-        File excelFile = diplomeExcelGenerator.generate(diplomes, fileNameHint);
+    String fileNameHint = "diplomes-" + parcours + "-" + promotionId;
+    File excelFile = diplomeExcelGenerator.generate(diplomes, fileNameHint);
 
-        try {
-            String bucketKey = "diplomes/" + promotionId + "/" + parcours + ".xlsx";
-            bucketComponent.upload(excelFile, bucketKey);
+    try {
+      String bucketKey = "diplomes/" + promotionId + "/" + parcours + ".xlsx";
+      bucketComponent.upload(excelFile, bucketKey);
 
-            byte[] fileBytes = Files.readAllBytes(excelFile.toPath());
-            return new ExportResult(fileBytes, "diplomes-" + parcours + ".xlsx");
-        } finally {
-            Files.deleteIfExists(excelFile.toPath());
-        }
+      byte[] fileBytes = Files.readAllBytes(excelFile.toPath());
+      return new ExportResult(fileBytes, "diplomes-" + parcours + ".xlsx");
+    } finally {
+      Files.deleteIfExists(excelFile.toPath());
     }
+  }
 }
