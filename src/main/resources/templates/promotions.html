@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Promotions - HEI Diplômés</title>
+</head>
+<body>
+<h1>Liste des promotions</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Libellé</th>
+        <th>Année d'entrée</th>
+        <th>Diplômés</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="promotion : ${promotions}">
+        <td th:text="${promotion.label}">Promotion 2023</td>
+        <td th:text="${promotion.entryYear}">2023</td>
+        <td>
+            <a th:href="@{/promotions/{id}/diplomes/export(id=${promotion.id}, parcours='EL')}">
+                Télécharger EL
+            </a>
+            |
+            <a th:href="@{/promotions/{id}/diplomes/export(id=${promotion.id}, parcours='TN')}">
+                Télécharger TN
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
