@@ -4,6 +4,8 @@ import hei.school.graduation.entity.StudentGroupAssignmentEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import hei.school.graduation.model.Enum.Parcours;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StudentGroupAssignmentRepository
@@ -17,4 +19,7 @@ public interface StudentGroupAssignmentRepository
   List<StudentGroupAssignmentEntity> findByGroup_Id(UUID groupId);
 
   boolean existsByStudent_IdAndSemestre_Id(UUID studentId, UUID semestreId);
+
+    List<StudentGroupAssignmentEntity> findBySemestre_IdAndGroup_Parcours(
+            UUID semestreId, Parcours parcours);
 }
