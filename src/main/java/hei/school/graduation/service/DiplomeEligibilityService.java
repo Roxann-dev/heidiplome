@@ -31,7 +31,7 @@ public class DiplomeEligibilityService {
 
   public EligibilityResult evaluate(UUID studentId, UUID promotionId) {
     List<SemesterEntity> semesters =
-        semesterRepository.findByPromotion_IdOrderByNumeroAsc(promotionId);
+        semesterRepository.findByPromotion_IdOrderByNumberAsc(promotionId);
 
     Set<UUID> coursesSuivis = new HashSet<>();
 

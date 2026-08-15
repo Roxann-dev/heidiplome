@@ -10,7 +10,7 @@ public interface SemesterRepository extends JpaRepository<SemesterEntity, UUID> 
 
   List<SemesterEntity> findByPromotion_IdAndCursusYear(UUID promotionId, int cursusYear);
 
-  List<SemesterEntity> findByPromotion_IdOrderByNumeroAsc(UUID promotionId);
+  List<SemesterEntity> findByPromotion_IdOrderByNumberAsc(UUID promotionId);
 
   Optional<SemesterEntity> findByPromotion_IdAndNumber(UUID promotionId, int number);
 }
