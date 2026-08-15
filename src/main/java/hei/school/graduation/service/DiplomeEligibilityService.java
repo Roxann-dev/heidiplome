@@ -31,21 +31,21 @@ public class DiplomeEligibilityService {
 
   public EligibilityResult evaluate(UUID studentId, UUID promotionId) {
     List<SemesterEntity> semesters =
-            semesterRepository.findByPromotion_IdOrderByNumeroAsc(promotionId);
+        semesterRepository.findByPromotion_IdOrderByNumeroAsc(promotionId);
 
     Set<UUID> coursesSuivis = new HashSet<>();
 
     for (SemesterEntity semester : semesters) {
       boolean studentAAtteintCeSemestre =
-              studentGroupAssignmentRepository.existsByStudent_IdAndSemestre_Id(
-                      studentId, semester.getId());
+          studentGroupAssignmentRepository.existsByStudent_IdAndSemestre_Id(
+              studentId, semester.getId());
 
       if (!studentAAtteintCeSemestre) {
         continue;
       }
 
       coursesSuivis.addAll(
-              groupIsolationService.resolveFollowedCourseIds(studentId, semester.getId()));
+          groupIsolationService.resolveFollowedCourseIds(studentId, semester.getId()));
     }
 
     if (coursesSuivis.isEmpty()) {
@@ -69,19 +69,19 @@ public class DiplomeEligibilityService {
       }
 
       CourseEntity course =
-              courseRepository
-                      .findById(courseId)
-                      .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
+          courseRepository
+              .findById(courseId)
+              .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
 
       sommePonderee =
-              sommePonderee.add(result.moyenne().multiply(BigDecimal.valueOf(course.getCredits())));
+          sommePonderee.add(result.moyenne().multiply(BigDecimal.valueOf(course.getCredits())));
       totalCredits += course.getCredits();
     }
 
     BigDecimal moyenneCumulee =
-            totalCredits == 0
-                    ? BigDecimal.ZERO
-                    : sommePonderee.divide(BigDecimal.valueOf(totalCredits), 2, RoundingMode.HALF_UP);
+        totalCredits == 0
+            ? BigDecimal.ZERO
+            : sommePonderee.divide(BigDecimal.valueOf(totalCredits), 2, RoundingMode.HALF_UP);
 
     return new EligibilityResult(diplome, moyenneCumulee);
   }
