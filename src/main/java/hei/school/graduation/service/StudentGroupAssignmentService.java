@@ -31,11 +31,12 @@ public class StudentGroupAssignmentService {
   public List<StudentGroupAssignment> findHistory(UUID studentId) {
     ensureStudentExists(studentId);
     return studentGroupAssignmentRepository.findByStudent_IdOrderByDateDebutAsc(studentId).stream()
-            .map(mapper::toDomain)
-            .toList();
+        .map(mapper::toDomain)
+        .toList();
   }
 
-  public StudentGroupAssignment assign(UUID studentId, StudentGroupAssignmentCreateRequest request) {
+  public StudentGroupAssignment assign(
+      UUID studentId, StudentGroupAssignmentCreateRequest request) {
     ensureStudentExists(studentId);
 
     if (!academicGroupRepository.existsById(request.groupId())) {
@@ -45,15 +46,18 @@ public class StudentGroupAssignmentService {
       throw new NotFoundException("Semestre introuvable : " + request.semestreId());
     }
     if (studentGroupAssignmentRepository.existsByStudent_IdAndSemestre_Id(
-            studentId, request.semestreId())) {
-      throw new ConflictException(
-              "Student " + studentId + " a déjà un group pour ce semestre");
+        studentId, request.semestreId())) {
+      throw new ConflictException("Student " + studentId + " a déjà un group pour ce semestre");
     }
 
     StudentGroupAssignment domain =
-            new StudentGroupAssignment(
-                    null, studentId, request.groupId(), request.semestreId(),
-                    request.dateDebut(), request.dateFin());
+        new StudentGroupAssignment(
+            null,
+            studentId,
+            request.groupId(),
+            request.semestreId(),
+            request.dateDebut(),
+            request.dateFin());
 
     StudentGroupAssignmentEntity entity = mapper.toEntity(domain);
     StudentGroupAssignmentEntity saved = studentGroupAssignmentRepository.save(entity);
@@ -63,9 +67,9 @@ public class StudentGroupAssignmentService {
 
   private void ensureStudentExists(UUID studentId) {
     UserEntity student =
-            userRepository
-                    .findById(studentId)
-                    .orElseThrow(() -> new NotFoundException("Student introuvable : " + studentId));
+        userRepository
+            .findById(studentId)
+            .orElseThrow(() -> new NotFoundException("Student introuvable : " + studentId));
 
     if (student.getRole() != UserRole.STUDENT) {
       throw new BadRequestException("User " + studentId + " n'a pas le rôle STUDENT");
