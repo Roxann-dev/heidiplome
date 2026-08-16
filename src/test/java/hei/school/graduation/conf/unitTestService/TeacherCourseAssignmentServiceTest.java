@@ -11,6 +11,7 @@ import hei.school.graduation.entity.UserEntity;
 import hei.school.graduation.exception.BadRequestException;
 import hei.school.graduation.exception.ConflictException;
 import hei.school.graduation.exception.NotFoundException;
+import hei.school.graduation.mapper.TeacherCourseAssignmentMapper;
 import hei.school.graduation.model.Enum.UserRole;
 import hei.school.graduation.repository.CourseRepository;
 import hei.school.graduation.repository.TeacherCourseAssignmentRepository;
@@ -30,6 +31,7 @@ class TeacherCourseAssignmentServiceTest {
   @Mock private UserRepository userRepository;
   @Mock private CourseRepository courseRepository;
   @Mock private TeacherCourseAssignmentRepository teacherCourseAssignmentRepository;
+  @Mock private TeacherCourseAssignmentMapper teacherCourseAssignmentMapper;
 
   private TeacherCourseAssignmentService service;
 
@@ -41,7 +43,10 @@ class TeacherCourseAssignmentServiceTest {
   void setUp() {
     service =
         new TeacherCourseAssignmentService(
-            userRepository, courseRepository, teacherCourseAssignmentRepository);
+            userRepository,
+            courseRepository,
+            teacherCourseAssignmentRepository,
+            teacherCourseAssignmentMapper);
     teacherId = UUID.randomUUID();
     courseId = UUID.randomUUID();
     anneeAcademique = 2026;
@@ -62,8 +67,8 @@ class TeacherCourseAssignmentServiceTest {
 
     TeacherCourseAssignmentEntity result = service.assign(teacherId, courseId, anneeAcademique);
 
-    assertThat(result.getTeacher().getId()).isEqualTo(teacherId);
-    assertThat(result.getCourse().getId()).isEqualTo(courseId);
+    assertThat(result.getTeacher()).isEqualTo(teacher);
+    assertThat(result.getCourse()).isEqualTo(course);
     assertThat(result.getAnneeAcademique()).isEqualTo(anneeAcademique);
     verify(teacherCourseAssignmentRepository).save(any(TeacherCourseAssignmentEntity.class));
   }

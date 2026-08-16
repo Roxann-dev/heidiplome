@@ -6,10 +6,13 @@ import hei.school.graduation.entity.UserEntity;
 import hei.school.graduation.exception.BadRequestException;
 import hei.school.graduation.exception.ConflictException;
 import hei.school.graduation.exception.NotFoundException;
+import hei.school.graduation.mapper.TeacherCourseAssignmentMapper;
 import hei.school.graduation.model.Enum.UserRole;
+import hei.school.graduation.model.TeacherCourseAssignment;
 import hei.school.graduation.repository.CourseRepository;
 import hei.school.graduation.repository.TeacherCourseAssignmentRepository;
 import hei.school.graduation.repository.UserRepository;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ public class TeacherCourseAssignmentService {
   private final UserRepository userRepository;
   private final CourseRepository courseRepository;
   private final TeacherCourseAssignmentRepository teacherCourseAssignmentRepository;
+  private final TeacherCourseAssignmentMapper teacherCourseAssignmentMapper;
 
   public TeacherCourseAssignmentEntity assign(UUID teacherId, UUID courseId, int anneeAcademique) {
     UserEntity teacher =
@@ -58,5 +62,19 @@ public class TeacherCourseAssignmentService {
             .build();
 
     return teacherCourseAssignmentRepository.save(assignment);
+  }
+
+  public List<TeacherCourseAssignment> findAll(UUID teacherId, Integer anneeAcademique) {
+    List<TeacherCourseAssignmentEntity> entities;
+    if (teacherId != null && anneeAcademique != null) {
+      entities =
+          teacherCourseAssignmentRepository.findByTeacher_IdAndAnneeAcademique(
+              teacherId, anneeAcademique);
+    } else if (teacherId != null) {
+      entities = teacherCourseAssignmentRepository.findByTeacher_Id(teacherId);
+    } else {
+      entities = teacherCourseAssignmentRepository.findAll();
+    }
+    return entities.stream().map(teacherCourseAssignmentMapper::toDomain).toList();
   }
 }
