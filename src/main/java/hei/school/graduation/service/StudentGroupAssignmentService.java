@@ -19,27 +19,27 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StudentGroupAssignmentService {
 
-    private final UserRepository userRepository;
-    private final AcademicGroupRepository academicGroupRepository;
-    private final SemesterRepository semesterRepository;
-    private final StudentGroupAssignmentRepository studentGroupAssignmentRepository;
-    private final StudentGroupAssignmentMapper mapper;
+  private final UserRepository userRepository;
+  private final AcademicGroupRepository academicGroupRepository;
+  private final SemesterRepository semesterRepository;
+  private final StudentGroupAssignmentRepository studentGroupAssignmentRepository;
+  private final StudentGroupAssignmentMapper mapper;
 
-    public List<StudentGroupAssignment> findHistory(UUID studentId) {
-        ensureStudentExists(studentId);
-        return studentGroupAssignmentRepository.findByStudent_IdOrderByDateDebutAsc(studentId).stream()
-                .map(mapper::toDomain)
-                .toList();
+  public List<StudentGroupAssignment> findHistory(UUID studentId) {
+    ensureStudentExists(studentId);
+    return studentGroupAssignmentRepository.findByStudent_IdOrderByDateDebutAsc(studentId).stream()
+        .map(mapper::toDomain)
+        .toList();
+  }
+
+  private void ensureStudentExists(UUID studentId) {
+    UserEntity student =
+        userRepository
+            .findById(studentId)
+            .orElseThrow(() -> new NotFoundException("Student introuvable : " + studentId));
+
+    if (student.getRole() != UserRole.STUDENT) {
+      throw new BadRequestException("User " + studentId + " n'a pas le rôle STUDENT");
     }
-
-    private void ensureStudentExists(UUID studentId) {
-        UserEntity student =
-                userRepository
-                        .findById(studentId)
-                        .orElseThrow(() -> new NotFoundException("Student introuvable : " + studentId));
-
-        if (student.getRole() != UserRole.STUDENT) {
-            throw new BadRequestException("User " + studentId + " n'a pas le rôle STUDENT");
-        }
-    }
+  }
 }
