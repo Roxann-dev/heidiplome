@@ -13,5 +13,5 @@ public record ExamCreateRequest(
         @DecimalMin(value = "0.0", inclusive = false, message = "Coefficient must be > 0")
         @DecimalMax(value = "1.0", inclusive = true, message = "Coefficient must be <= 1")
         BigDecimal coefficient,
-    ExamType type // nullable: defaults to NORMAL in the service
+    ExamType type
     ) {}
