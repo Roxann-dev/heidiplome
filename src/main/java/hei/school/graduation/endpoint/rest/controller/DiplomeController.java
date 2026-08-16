@@ -1,8 +1,11 @@
 package hei.school.graduation.endpoint.rest.controller;
 
+import hei.school.graduation.model.DiplomeEntry;
 import hei.school.graduation.model.Enum.Parcours;
+import hei.school.graduation.service.DiplomeListService;
 import hei.school.graduation.service.excel.DiplomeExportService;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +27,7 @@ public class DiplomeController {
       MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
   private final DiplomeExportService diplomeExportService;
+  private final DiplomeListService diplomeListService;
 
   @GetMapping("/{promotionId}/diplomes/export")
   public ResponseEntity<byte[]> exportDiplomes(
@@ -36,5 +40,11 @@ public class DiplomeController {
     headers.setContentDispositionFormData("attachment", result.fileName());
 
     return new ResponseEntity<>(result.fileBytes(), headers, HttpStatus.OK);
+  }
+
+  @GetMapping("/{promotionId}/diplomes")
+  public List<DiplomeEntry> previewDiplomes(
+      @PathVariable UUID promotionId, @RequestParam Parcours parcours) {
+    return diplomeListService.computeDiplomes(promotionId, parcours);
   }
 }
