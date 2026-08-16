@@ -89,8 +89,6 @@ class ExamServiceTest {
 
   @Test
   void create_shouldThrowNotFound_whenCourseDoesNotExist() {
-    // Le lookup du course a lieu AVANT la vérification d'ownership :
-    // pas besoin d'authentifier pour ce cas, l'exception part avant.
     when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(
