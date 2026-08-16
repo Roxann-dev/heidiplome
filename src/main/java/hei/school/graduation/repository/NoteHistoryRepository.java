@@ -1,7 +1,11 @@
 package hei.school.graduation.repository;
 
 import hei.school.graduation.entity.NoteHistoryEntity;
+
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface NoteHistoryRepository extends JpaRepository<NoteHistoryEntity, UUID> {}
+public interface NoteHistoryRepository extends JpaRepository<NoteHistoryEntity, UUID> {
+    List<NoteHistoryEntity> findByNote_IdOrderByModificationDateDesc(UUID noteId);
+}
