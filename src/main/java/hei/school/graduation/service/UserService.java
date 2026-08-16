@@ -5,9 +5,9 @@ import hei.school.graduation.entity.UserEntity;
 import hei.school.graduation.exception.ConflictException;
 import hei.school.graduation.model.Enum.UserRole;
 import hei.school.graduation.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,14 +30,14 @@ public class UserService {
     }
 
     UserEntity user =
-            UserEntity.builder()
-                    .reference(request.reference())
-                    .lastName(request.lastName())
-                    .firstName(request.firstName())
-                    .email(request.email())
-                    .passwordHash(passwordEncoder.encode(request.password()))
-                    .role(request.role())
-                    .build();
+        UserEntity.builder()
+            .reference(request.reference())
+            .lastName(request.lastName())
+            .firstName(request.firstName())
+            .email(request.email())
+            .passwordHash(passwordEncoder.encode(request.password()))
+            .role(request.role())
+            .build();
 
     return userRepository.save(user);
   }
