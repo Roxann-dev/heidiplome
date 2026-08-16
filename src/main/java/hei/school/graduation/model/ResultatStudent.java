@@ -6,10 +6,10 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record ResultatStudent(
-        UUID studentId,
-        String std,
-        String nom,
-        String prenom,
-        Parcours parcoursActuel,
-        BigDecimal moyenneCumulee,
-        StatutDiplome statut) {}
+    UUID studentId,
+    String std,
+    String nom,
+    String prenom,
+    Parcours parcoursActuel,
+    BigDecimal moyenneCumulee,
+    StatutDiplome statut) {}
