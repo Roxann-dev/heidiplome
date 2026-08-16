@@ -42,7 +42,7 @@ public class CourseService {
     return courseRepository
         .findById(courseId)
         .map(courseMapper::toDomain)
-        .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
+        .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
   }
 
   public Course create(CourseCreateRequest request) {
@@ -50,7 +50,7 @@ public class CourseService {
         semesterRepository
             .findById(request.semestreId())
             .orElseThrow(
-                () -> new NotFoundException("Semestre introuvable : " + request.semestreId()));
+                () -> new NotFoundException("Semester not found: " + request.semestreId()));
 
     CourseEntity entity =
         CourseEntity.builder()
@@ -68,22 +68,22 @@ public class CourseService {
     var course =
         courseRepository
             .findById(courseId)
-            .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
+            .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
 
     var group =
         academicGroupRepository
             .findById(request.groupId())
-            .orElseThrow(() -> new NotFoundException("Group introuvable : " + request.groupId()));
+            .orElseThrow(() -> new NotFoundException("Group not found: " + request.groupId()));
 
     var semester =
         semesterRepository
             .findById(request.semestreId())
             .orElseThrow(
-                () -> new NotFoundException("Semestre introuvable : " + request.semestreId()));
+                () -> new NotFoundException("Semester not found: " + request.semestreId()));
 
     if (courseGroupAssignmentRepository.existsByCourse_IdAndGroup_Id(courseId, request.groupId())) {
       throw new ConflictException(
-          "Course " + courseId + " déjà associé au group " + request.groupId());
+          "Course " + courseId + " is already associated with group " + request.groupId());
     }
 
     CourseGroupAssignmentEntity entity =

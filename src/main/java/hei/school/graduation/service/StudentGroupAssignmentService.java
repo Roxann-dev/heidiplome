@@ -40,14 +40,15 @@ public class StudentGroupAssignmentService {
     ensureStudentExists(studentId);
 
     if (!academicGroupRepository.existsById(request.groupId())) {
-      throw new NotFoundException("Group introuvable : " + request.groupId());
+      throw new NotFoundException("Group not found: " + request.groupId());
     }
     if (!semesterRepository.existsById(request.semestreId())) {
-      throw new NotFoundException("Semestre introuvable : " + request.semestreId());
+      throw new NotFoundException("Semester not found: " + request.semestreId());
     }
     if (studentGroupAssignmentRepository.existsByStudent_IdAndSemestre_Id(
         studentId, request.semestreId())) {
-      throw new ConflictException("Student " + studentId + " a déjà un group pour ce semestre");
+      throw new ConflictException(
+          "Student " + studentId + " already has a group for this semester");
     }
 
     StudentGroupAssignment domain =
@@ -69,10 +70,10 @@ public class StudentGroupAssignmentService {
     UserEntity student =
         userRepository
             .findById(studentId)
-            .orElseThrow(() -> new NotFoundException("Student introuvable : " + studentId));
+            .orElseThrow(() -> new NotFoundException("Student not found: " + studentId));
 
     if (student.getRole() != UserRole.STUDENT) {
-      throw new BadRequestException("User " + studentId + " n'a pas le rôle STUDENT");
+      throw new BadRequestException("User " + studentId + " does not have the STUDENT role");
     }
   }
 }

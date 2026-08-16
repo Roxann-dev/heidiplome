@@ -71,7 +71,7 @@ public class DiplomeEligibilityService {
       CourseEntity course =
           courseRepository
               .findById(courseId)
-              .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
+              .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
 
       sommePonderee =
           sommePonderee.add(result.moyenne().multiply(BigDecimal.valueOf(course.getCredits())));

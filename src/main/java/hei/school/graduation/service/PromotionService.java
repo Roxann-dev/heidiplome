@@ -24,6 +24,6 @@ public class PromotionService {
     return promotionRepository
         .findById(promotionId)
         .map(promotionMapper::toDomain)
-        .orElseThrow(() -> new NotFoundException("Promotion introuvable : " + promotionId));
+        .orElseThrow(() -> new NotFoundException("Promotion not found: " + promotionId));
   }
 }

@@ -23,10 +23,10 @@ public class UserService {
 
   public UserEntity create(UserCreateRequest request) {
     if (userRepository.existsByEmail(request.email())) {
-      throw new ConflictException("Email déjà utilisé : " + request.email());
+      throw new ConflictException("Email already in use: " + request.email());
     }
     if (userRepository.existsByReference(request.reference())) {
-      throw new ConflictException("Référence déjà utilisée : " + request.reference());
+      throw new ConflictException("Reference already in use: " + request.reference());
     }
 
     UserEntity user =

@@ -20,7 +20,7 @@ public class SemesterService {
 
   public List<Semester> findByPromotion(UUID promotionId) {
     if (!promotionRepository.existsById(promotionId)) {
-      throw new NotFoundException("Promotion introuvable : " + promotionId);
+      throw new NotFoundException("Promotion not found: " + promotionId);
     }
     return semesterRepository.findByPromotion_IdOrderByNumberAsc(promotionId).stream()
         .map(semesterMapper::toDomain)

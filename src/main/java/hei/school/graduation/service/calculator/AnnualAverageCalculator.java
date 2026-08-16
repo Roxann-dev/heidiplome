@@ -53,7 +53,7 @@ public class AnnualAverageCalculator {
         CourseEntity course =
             courseRepository
                 .findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
+                .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
 
         sommePonderee =
             sommePonderee.add(result.moyenne().multiply(BigDecimal.valueOf(course.getCredits())));
@@ -74,8 +74,7 @@ public class AnnualAverageCalculator {
         studentGroupAssignmentRepository.findByStudent_IdOrderByDateDebutAsc(studentId).stream()
             .findFirst()
             .orElseThrow(
-                () ->
-                    new NotFoundException("Aucune affectation de group pour student " + studentId));
+                () -> new NotFoundException("No group assignment found for student " + studentId));
     return anyAssignment.getSemestre().getPromotion().getId();
   }
 }
