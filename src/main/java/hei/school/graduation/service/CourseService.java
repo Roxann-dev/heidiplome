@@ -23,76 +23,76 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CourseService {
 
-    private final CourseRepository courseRepository;
-    private final SemesterRepository semesterRepository;
-    private final AcademicGroupRepository academicGroupRepository;
-    private final CourseGroupAssignmentRepository courseGroupAssignmentRepository;
-    private final CourseMapper courseMapper;
-    private final CourseGroupAssignmentMapper courseGroupAssignmentMapper;
+  private final CourseRepository courseRepository;
+  private final SemesterRepository semesterRepository;
+  private final AcademicGroupRepository academicGroupRepository;
+  private final CourseGroupAssignmentRepository courseGroupAssignmentRepository;
+  private final CourseMapper courseMapper;
+  private final CourseGroupAssignmentMapper courseGroupAssignmentMapper;
 
-    public List<Course> findAll(UUID semestreId) {
-        var entities =
-                semestreId == null
-                        ? courseRepository.findAll()
-                        : courseRepository.findBySemester_Id(semestreId);
-        return entities.stream().map(courseMapper::toDomain).toList();
+  public List<Course> findAll(UUID semestreId) {
+    var entities =
+        semestreId == null
+            ? courseRepository.findAll()
+            : courseRepository.findBySemester_Id(semestreId);
+    return entities.stream().map(courseMapper::toDomain).toList();
+  }
+
+  public Course findById(UUID courseId) {
+    return courseRepository
+        .findById(courseId)
+        .map(courseMapper::toDomain)
+        .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
+  }
+
+  public Course create(CourseCreateRequest request) {
+    var semester =
+        semesterRepository
+            .findById(request.semestreId())
+            .orElseThrow(
+                () -> new NotFoundException("Semestre introuvable : " + request.semestreId()));
+
+    CourseEntity entity =
+        CourseEntity.builder()
+            .referenceCs(request.referenceCs())
+            .title(request.title())
+            .credits(request.credits())
+            .semester(semester)
+            .build();
+
+    return courseMapper.toDomain(courseRepository.save(entity));
+  }
+
+  public CourseGroupAssignment assignGroup(
+      UUID courseId, CourseGroupAssignmentCreateRequest request) {
+    var course =
+        courseRepository
+            .findById(courseId)
+            .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
+
+    var group =
+        academicGroupRepository
+            .findById(request.groupId())
+            .orElseThrow(() -> new NotFoundException("Group introuvable : " + request.groupId()));
+
+    var semester =
+        semesterRepository
+            .findById(request.semestreId())
+            .orElseThrow(
+                () -> new NotFoundException("Semestre introuvable : " + request.semestreId()));
+
+    if (courseGroupAssignmentRepository.existsByCourse_IdAndGroup_Id(courseId, request.groupId())) {
+      throw new ConflictException(
+          "Course " + courseId + " déjà associé au group " + request.groupId());
     }
 
-    public Course findById(UUID courseId) {
-        return courseRepository
-                .findById(courseId)
-                .map(courseMapper::toDomain)
-                .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
-    }
+    CourseGroupAssignmentEntity entity =
+        CourseGroupAssignmentEntity.builder()
+            .course(course)
+            .group(group)
+            .semestre(semester)
+            .build();
 
-    public Course create(CourseCreateRequest request) {
-        var semester =
-                semesterRepository
-                        .findById(request.semestreId())
-                        .orElseThrow(
-                                () -> new NotFoundException("Semestre introuvable : " + request.semestreId()));
-
-        CourseEntity entity =
-                CourseEntity.builder()
-                        .referenceCs(request.referenceCs())
-                        .title(request.title())
-                        .credits(request.credits())
-                        .semester(semester)
-                        .build();
-
-        return courseMapper.toDomain(courseRepository.save(entity));
-    }
-
-    public CourseGroupAssignment assignGroup(
-            UUID courseId, CourseGroupAssignmentCreateRequest request) {
-        var course =
-                courseRepository
-                        .findById(courseId)
-                        .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
-
-        var group =
-                academicGroupRepository
-                        .findById(request.groupId())
-                        .orElseThrow(() -> new NotFoundException("Group introuvable : " + request.groupId()));
-
-        var semester =
-                semesterRepository
-                        .findById(request.semestreId())
-                        .orElseThrow(
-                                () -> new NotFoundException("Semestre introuvable : " + request.semestreId()));
-
-        if (courseGroupAssignmentRepository.existsByCourse_IdAndGroup_Id(courseId, request.groupId())) {
-            throw new ConflictException(
-                    "Course " + courseId + " déjà associé au group " + request.groupId());
-        }
-
-        CourseGroupAssignmentEntity entity =
-                CourseGroupAssignmentEntity.builder()
-                        .course(course)
-                        .group(group)
-                        .semestre(semester)
-                        .build();
-
-        return courseGroupAssignmentMapper.toDomain(courseGroupAssignmentRepository.save(entity));
-    }
+    return courseGroupAssignmentMapper.toDomain(courseGroupAssignmentRepository.save(entity));
+  }
 }
