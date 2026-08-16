@@ -28,11 +28,11 @@ public class ExamService {
   private final TeacherCourseAssignmentRepository teacherCourseAssignmentRepository;
 
   public ExamEntity create(
-          UUID courseId, LocalDate dateExamen, BigDecimal coefficient, ExamType type) {
+      UUID courseId, LocalDate dateExamen, BigDecimal coefficient, ExamType type) {
     CourseEntity course =
-            courseRepository
-                    .findById(courseId)
-                    .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
+        courseRepository
+            .findById(courseId)
+            .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
 
     checkTeacherOwnsCourseOrAdmin(courseId);
 
@@ -40,31 +40,31 @@ public class ExamService {
 
     if (resolvedType == ExamType.NORMAL) {
       BigDecimal existingSum =
-              examRepository.findByCourseId(courseId).stream()
-                      .filter(examen -> examen.getType() == ExamType.NORMAL)
-                      .map(ExamEntity::getCoefficient)
-                      .reduce(BigDecimal.ZERO, BigDecimal::add);
+          examRepository.findByCourseId(courseId).stream()
+              .filter(examen -> examen.getType() == ExamType.NORMAL)
+              .map(ExamEntity::getCoefficient)
+              .reduce(BigDecimal.ZERO, BigDecimal::add);
 
       BigDecimal projectedSum = existingSum.add(coefficient);
       if (projectedSum.compareTo(BigDecimal.ONE) > 0) {
         throw new ConflictException(
-                "Sum of NORMAL exam coefficients for course "
-                        + courseId
-                        + " would exceed 1 (currently "
-                        + existingSum
-                        + ", adding "
-                        + coefficient
-                        + ")");
+            "Sum of NORMAL exam coefficients for course "
+                + courseId
+                + " would exceed 1 (currently "
+                + existingSum
+                + ", adding "
+                + coefficient
+                + ")");
       }
     }
 
     ExamEntity examen =
-            ExamEntity.builder()
-                    .course(course)
-                    .examDate(dateExamen)
-                    .coefficient(coefficient)
-                    .type(resolvedType)
-                    .build();
+        ExamEntity.builder()
+            .course(course)
+            .examDate(dateExamen)
+            .coefficient(coefficient)
+            .type(resolvedType)
+            .build();
 
     return examRepository.save(examen);
   }
@@ -78,19 +78,19 @@ public class ExamService {
 
   public ExamEntity findById(UUID examId) {
     return examRepository
-            .findById(examId)
-            .orElseThrow(() -> new NotFoundException("Exam not found: " + examId));
+        .findById(examId)
+        .orElseThrow(() -> new NotFoundException("Exam not found: " + examId));
   }
 
   private void checkTeacherOwnsCourseOrAdmin(UUID courseId) {
     UserPrincipal principal =
-            (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
     boolean isAdmin = principal.getRole() == UserRole.ADMIN;
     boolean isAssignedTeacher =
-            principal.getRole() == UserRole.TEACHER
-                    && teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_Id(
-                    principal.getId(), courseId);
+        principal.getRole() == UserRole.TEACHER
+            && teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_Id(
+                principal.getId(), courseId);
 
     if (!isAdmin && !isAssignedTeacher) {
       throw new AccessDeniedException("You can only create exams for your own courses.");

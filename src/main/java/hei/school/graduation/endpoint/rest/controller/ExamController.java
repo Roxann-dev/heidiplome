@@ -20,24 +20,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ExamController {
 
-    private final ExamService examService;
-    private final ExamMapper examMapper;
+  private final ExamService examService;
+  private final ExamMapper examMapper;
 
-    @GetMapping("/courses/{courseId}/examens")
-    public List<Exam> listByCourse(@PathVariable UUID courseId) {
-        return examService.findByCourse(courseId).stream().map(examMapper::toDomain).toList();
-    }
+  @GetMapping("/courses/{courseId}/examens")
+  public List<Exam> listByCourse(@PathVariable UUID courseId) {
+    return examService.findByCourse(courseId).stream().map(examMapper::toDomain).toList();
+  }
 
-    @PostMapping("/courses/{courseId}/examens")
-    public ResponseEntity<Exam> create(
-            @PathVariable UUID courseId, @Valid @RequestBody ExamCreateRequest request) {
-        var created =
-                examService.create(courseId, request.examDate(), request.coefficient(), request.type());
-        return ResponseEntity.status(HttpStatus.CREATED).body(examMapper.toDomain(created));
-    }
+  @PostMapping("/courses/{courseId}/examens")
+  public ResponseEntity<Exam> create(
+      @PathVariable UUID courseId, @Valid @RequestBody ExamCreateRequest request) {
+    var created =
+        examService.create(courseId, request.examDate(), request.coefficient(), request.type());
+    return ResponseEntity.status(HttpStatus.CREATED).body(examMapper.toDomain(created));
+  }
 
-    @GetMapping("/examens/{examenId}")
-    public Exam getById(@PathVariable UUID examenId) {
-        return examMapper.toDomain(examService.findById(examenId));
-    }
+  @GetMapping("/examens/{examenId}")
+  public Exam getById(@PathVariable UUID examenId) {
+    return examMapper.toDomain(examService.findById(examenId));
+  }
 }
