@@ -19,43 +19,43 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AcademicGroupService {
 
-    private final AcademicGroupRepository academicGroupRepository;
-    private final SemesterRepository semesterRepository;
-    private final StudentGroupAssignmentRepository studentGroupAssignmentRepository;
-    private final AcademicGroupMapper academicGroupMapper;
-    private final StudentGroupAssignmentMapper studentGroupAssignmentMapper;
+  private final AcademicGroupRepository academicGroupRepository;
+  private final SemesterRepository semesterRepository;
+  private final StudentGroupAssignmentRepository studentGroupAssignmentRepository;
+  private final AcademicGroupMapper academicGroupMapper;
+  private final StudentGroupAssignmentMapper studentGroupAssignmentMapper;
 
-    public List<AcademicGroup> findBySemester(UUID semestreId) {
-        if (!semesterRepository.existsById(semestreId)) {
-            throw new NotFoundException("Semestre introuvable : " + semestreId);
-        }
-        return academicGroupRepository.findBySemester_Id(semestreId).stream()
-                .map(academicGroupMapper::toDomain)
-                .toList();
+  public List<AcademicGroup> findBySemester(UUID semestreId) {
+    if (!semesterRepository.existsById(semestreId)) {
+      throw new NotFoundException("Semestre introuvable : " + semestreId);
     }
+    return academicGroupRepository.findBySemester_Id(semestreId).stream()
+        .map(academicGroupMapper::toDomain)
+        .toList();
+  }
 
-    public AcademicGroup create(UUID semestreId, GroupCreateRequest request) {
-        var semester =
-                semesterRepository
-                        .findById(semestreId)
-                        .orElseThrow(() -> new NotFoundException("Semestre introuvable : " + semestreId));
+  public AcademicGroup create(UUID semestreId, GroupCreateRequest request) {
+    var semester =
+        semesterRepository
+            .findById(semestreId)
+            .orElseThrow(() -> new NotFoundException("Semestre introuvable : " + semestreId));
 
-        AcademicGroupEntity entity =
-                AcademicGroupEntity.builder()
-                        .reference(request.reference())
-                        .parcours(request.parcours())
-                        .semester(semester)
-                        .build();
+    AcademicGroupEntity entity =
+        AcademicGroupEntity.builder()
+            .reference(request.reference())
+            .parcours(request.parcours())
+            .semester(semester)
+            .build();
 
-        return academicGroupMapper.toDomain(academicGroupRepository.save(entity));
+    return academicGroupMapper.toDomain(academicGroupRepository.save(entity));
+  }
+
+  public List<StudentGroupAssignment> findStudents(UUID groupId) {
+    if (!academicGroupRepository.existsById(groupId)) {
+      throw new NotFoundException("Group introuvable : " + groupId);
     }
-
-    public List<StudentGroupAssignment> findStudents(UUID groupId) {
-        if (!academicGroupRepository.existsById(groupId)) {
-            throw new NotFoundException("Group introuvable : " + groupId);
-        }
-        return studentGroupAssignmentRepository.findByGroup_Id(groupId).stream()
-                .map(studentGroupAssignmentMapper::toDomain)
-                .toList();
-    }
+    return studentGroupAssignmentRepository.findByGroup_Id(groupId).stream()
+        .map(studentGroupAssignmentMapper::toDomain)
+        .toList();
+  }
 }
