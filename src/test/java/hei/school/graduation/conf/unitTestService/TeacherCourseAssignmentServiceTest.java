@@ -42,11 +42,11 @@ class TeacherCourseAssignmentServiceTest {
   @BeforeEach
   void setUp() {
     service =
-            new TeacherCourseAssignmentService(
-                    userRepository,
-                    courseRepository,
-                    teacherCourseAssignmentRepository,
-                    teacherCourseAssignmentMapper);
+        new TeacherCourseAssignmentService(
+            userRepository,
+            courseRepository,
+            teacherCourseAssignmentRepository,
+            teacherCourseAssignmentMapper);
     teacherId = UUID.randomUUID();
     courseId = UUID.randomUUID();
     anneeAcademique = 2026;
@@ -61,9 +61,9 @@ class TeacherCourseAssignmentServiceTest {
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
     when(teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_IdAndAnneeAcademique(
             teacherId, courseId, anneeAcademique))
-            .thenReturn(false);
+        .thenReturn(false);
     when(teacherCourseAssignmentRepository.save(any(TeacherCourseAssignmentEntity.class)))
-            .thenAnswer(invocation -> invocation.getArgument(0));
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
     TeacherCourseAssignmentEntity result = service.assign(teacherId, courseId, anneeAcademique);
 
@@ -78,8 +78,8 @@ class TeacherCourseAssignmentServiceTest {
     when(userRepository.findById(teacherId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> service.assign(teacherId, courseId, anneeAcademique))
-            .isInstanceOf(NotFoundException.class)
-            .hasMessageContaining(teacherId.toString());
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining(teacherId.toString());
 
     verifyNoInteractions(courseRepository, teacherCourseAssignmentRepository);
   }
@@ -91,8 +91,8 @@ class TeacherCourseAssignmentServiceTest {
     when(userRepository.findById(teacherId)).thenReturn(Optional.of(notATeacher));
 
     assertThatThrownBy(() -> service.assign(teacherId, courseId, anneeAcademique))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("does not have role TEACHER");
+        .isInstanceOf(BadRequestException.class)
+        .hasMessageContaining("does not have role TEACHER");
 
     verifyNoInteractions(courseRepository, teacherCourseAssignmentRepository);
   }
@@ -105,8 +105,8 @@ class TeacherCourseAssignmentServiceTest {
     when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> service.assign(teacherId, courseId, anneeAcademique))
-            .isInstanceOf(NotFoundException.class)
-            .hasMessageContaining(courseId.toString());
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining(courseId.toString());
 
     verifyNoInteractions(teacherCourseAssignmentRepository);
   }
@@ -120,11 +120,11 @@ class TeacherCourseAssignmentServiceTest {
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
     when(teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_IdAndAnneeAcademique(
             teacherId, courseId, anneeAcademique))
-            .thenReturn(true);
+        .thenReturn(true);
 
     assertThatThrownBy(() -> service.assign(teacherId, courseId, anneeAcademique))
-            .isInstanceOf(ConflictException.class)
-            .hasMessageContaining("already assigned");
+        .isInstanceOf(ConflictException.class)
+        .hasMessageContaining("already assigned");
 
     verify(teacherCourseAssignmentRepository, never()).save(any());
   }

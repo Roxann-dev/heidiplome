@@ -28,38 +28,38 @@ public class TeacherCourseAssignmentService {
 
   public TeacherCourseAssignmentEntity assign(UUID teacherId, UUID courseId, int anneeAcademique) {
     UserEntity teacher =
-            userRepository
-                    .findById(teacherId)
-                    .orElseThrow(() -> new NotFoundException("Teacher not found: " + teacherId));
+        userRepository
+            .findById(teacherId)
+            .orElseThrow(() -> new NotFoundException("Teacher not found: " + teacherId));
 
     if (teacher.getRole() != UserRole.TEACHER) {
       throw new BadRequestException("User " + teacherId + " does not have role TEACHER");
     }
 
     CourseEntity course =
-            courseRepository
-                    .findById(courseId)
-                    .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
+        courseRepository
+            .findById(courseId)
+            .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
 
     boolean alreadyAssigned =
-            teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_IdAndAnneeAcademique(
-                    teacherId, courseId, anneeAcademique);
+        teacherCourseAssignmentRepository.existsByTeacher_IdAndCourse_IdAndAnneeAcademique(
+            teacherId, courseId, anneeAcademique);
     if (alreadyAssigned) {
       throw new ConflictException(
-              "Teacher "
-                      + teacherId
-                      + " is already assigned to course "
-                      + courseId
-                      + " for year "
-                      + anneeAcademique);
+          "Teacher "
+              + teacherId
+              + " is already assigned to course "
+              + courseId
+              + " for year "
+              + anneeAcademique);
     }
 
     TeacherCourseAssignmentEntity assignment =
-            TeacherCourseAssignmentEntity.builder()
-                    .teacher(teacher)
-                    .course(course)
-                    .anneeAcademique(anneeAcademique)
-                    .build();
+        TeacherCourseAssignmentEntity.builder()
+            .teacher(teacher)
+            .course(course)
+            .anneeAcademique(anneeAcademique)
+            .build();
 
     return teacherCourseAssignmentRepository.save(assignment);
   }
@@ -68,8 +68,8 @@ public class TeacherCourseAssignmentService {
     List<TeacherCourseAssignmentEntity> entities;
     if (teacherId != null && anneeAcademique != null) {
       entities =
-              teacherCourseAssignmentRepository.findByTeacher_IdAndAnneeAcademique(
-                      teacherId, anneeAcademique);
+          teacherCourseAssignmentRepository.findByTeacher_IdAndAnneeAcademique(
+              teacherId, anneeAcademique);
     } else if (teacherId != null) {
       entities = teacherCourseAssignmentRepository.findByTeacher_Id(teacherId);
     } else {
