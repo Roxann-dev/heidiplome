@@ -25,10 +25,7 @@ public class GroupIsolationService {
             .orElseThrow(
                 () ->
                     new NotFoundException(
-                        "Student "
-                            + studentId
-                            + " n'a pas de group pour le semestre "
-                            + semestreId));
+                        "Student " + studentId + " has no group for semester " + semestreId));
     return assignment.getGroup().getId();
   }
 
@@ -44,7 +41,7 @@ public class GroupIsolationService {
   public void checkStudentFollowsCourse(UUID studentId, UUID courseId, UUID semestreId) {
     if (!resolveFollowedCourseIds(studentId, semestreId).contains(courseId)) {
       throw new ForbiddenException(
-          "Student " + studentId + " ne suit pas le course " + courseId + " sur ce semestre");
+          "Student " + studentId + " does not follow course " + courseId + " for this semester");
     }
   }
 }

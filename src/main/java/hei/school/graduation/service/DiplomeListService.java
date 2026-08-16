@@ -33,7 +33,7 @@ public class DiplomeListService {
             .orElseThrow(
                 () ->
                     new NotFoundException(
-                        "Aucun semestre S" + DERNIER_SEMESTRE + " pour cette promotion"));
+                        "No semester S" + DERNIER_SEMESTRE + " for this promotion"));
 
     List<StudentGroupAssignmentEntity> assignmentsS6 =
         studentGroupAssignmentRepository.findBySemestre_IdAndGroup_Parcours(

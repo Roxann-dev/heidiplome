@@ -27,7 +27,7 @@ public class AcademicGroupService {
 
   public List<AcademicGroup> findBySemester(UUID semestreId) {
     if (!semesterRepository.existsById(semestreId)) {
-      throw new NotFoundException("Semestre introuvable : " + semestreId);
+      throw new NotFoundException("Semester not found: " + semestreId);
     }
     return academicGroupRepository.findBySemester_Id(semestreId).stream()
         .map(academicGroupMapper::toDomain)
@@ -38,7 +38,7 @@ public class AcademicGroupService {
     var semester =
         semesterRepository
             .findById(semestreId)
-            .orElseThrow(() -> new NotFoundException("Semestre introuvable : " + semestreId));
+            .orElseThrow(() -> new NotFoundException("Semester not found: " + semestreId));
 
     AcademicGroupEntity entity =
         AcademicGroupEntity.builder()
@@ -52,7 +52,7 @@ public class AcademicGroupService {
 
   public List<StudentGroupAssignment> findStudents(UUID groupId) {
     if (!academicGroupRepository.existsById(groupId)) {
-      throw new NotFoundException("Group introuvable : " + groupId);
+      throw new NotFoundException("Group not found: " + groupId);
     }
     return studentGroupAssignmentRepository.findByGroup_Id(groupId).stream()
         .map(studentGroupAssignmentMapper::toDomain)
