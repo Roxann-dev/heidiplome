@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public record NoteUpdateRequest(
-        @NotNull
+    @NotNull
         @DecimalMin(value = "0.0", inclusive = true, message = "Value must be >= 0")
         @DecimalMax(value = "20.0", inclusive = true, message = "Value must be <= 20")
         BigDecimal value,
-        @NotBlank String reason) {}
+    @NotBlank String reason) {}

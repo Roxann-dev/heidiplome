@@ -26,38 +26,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NoteController {
 
-    private final NoteService noteService;
-    private final NoteMapper noteMapper;
-    private final NoteHistoryMapper noteHistoryMapper;
+  private final NoteService noteService;
+  private final NoteMapper noteMapper;
+  private final NoteHistoryMapper noteHistoryMapper;
 
-    @GetMapping("/examens/{examenId}/notes")
-    public List<Note> listByExam(@PathVariable UUID examenId) {
-        return noteService.findByExam(examenId).stream().map(noteMapper::toDomain).toList();
-    }
+  @GetMapping("/examens/{examenId}/notes")
+  public List<Note> listByExam(@PathVariable UUID examenId) {
+    return noteService.findByExam(examenId).stream().map(noteMapper::toDomain).toList();
+  }
 
-    @PostMapping("/examens/{examenId}/notes")
-    public ResponseEntity<Note> create(
-            @PathVariable UUID examenId, @Valid @RequestBody NoteCreateRequest request) {
-        var created =
-                noteService.saisir(examenId, request.studentId(), request.value(), currentUserId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(noteMapper.toDomain(created));
-    }
+  @PostMapping("/examens/{examenId}/notes")
+  public ResponseEntity<Note> create(
+      @PathVariable UUID examenId, @Valid @RequestBody NoteCreateRequest request) {
+    var created =
+        noteService.saisir(examenId, request.studentId(), request.value(), currentUserId());
+    return ResponseEntity.status(HttpStatus.CREATED).body(noteMapper.toDomain(created));
+  }
 
-    @PatchMapping("/notes/{noteId}")
-    public Note update(@PathVariable UUID noteId, @Valid @RequestBody NoteUpdateRequest request) {
-        var updated =
-                noteService.update(noteId, request.value(), request.reason(), currentUserId());
-        return noteMapper.toDomain(updated);
-    }
+  @PatchMapping("/notes/{noteId}")
+  public Note update(@PathVariable UUID noteId, @Valid @RequestBody NoteUpdateRequest request) {
+    var updated = noteService.update(noteId, request.value(), request.reason(), currentUserId());
+    return noteMapper.toDomain(updated);
+  }
 
-    @GetMapping("/notes/{noteId}/historique")
-    public List<NoteHistory> history(@PathVariable UUID noteId) {
-        return noteService.findHistory(noteId).stream().map(noteHistoryMapper::toDomain).toList();
-    }
+  @GetMapping("/notes/{noteId}/historique")
+  public List<NoteHistory> history(@PathVariable UUID noteId) {
+    return noteService.findHistory(noteId).stream().map(noteHistoryMapper::toDomain).toList();
+  }
 
-    private UUID currentUserId() {
-        UserPrincipal principal =
-                (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return principal.getId();
-    }
+  private UUID currentUserId() {
+    UserPrincipal principal =
+        (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    return principal.getId();
+  }
 }
