@@ -21,4 +21,8 @@ public interface StudentGroupAssignmentRepository
 
   List<StudentGroupAssignmentEntity> findBySemestre_IdAndGroup_Parcours(
       UUID semestreId, Parcours parcours);
+
+  List<StudentGroupAssignmentEntity> findBySemestre_Id(UUID semestreId);
+
+  Optional<StudentGroupAssignmentEntity> findTopByStudent_IdOrderByDateDebutDesc(UUID studentId);
 }
