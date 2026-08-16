@@ -216,6 +216,6 @@ class CourseServiceTest {
 
     assertThatThrownBy(() -> service.assignGroup(courseId, request))
         .isInstanceOf(ConflictException.class)
-        .hasMessageContaining("déjà associé");
+        .hasMessageContaining("already associated");
   }
 }
