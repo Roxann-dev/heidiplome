@@ -3,17 +3,20 @@ package hei.school.graduation.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -44,6 +47,13 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ErrorResponse> handleBadCredentials(
       BadCredentialsException ex, HttpServletRequest request) {
+    return build(HttpStatus.UNAUTHORIZED, "Invalid credentials", request);
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<ErrorResponse> handleAuthentication(
+      AuthenticationException ex, HttpServletRequest request) {
+    log.error("Authentication error on {}", request.getRequestURI(), ex);
     return build(HttpStatus.UNAUTHORIZED, "Invalid credentials", request);
   }
 
@@ -83,6 +93,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
+    log.error("Unexpected error on {}", request.getRequestURI(), ex);
     return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", request);
   }
 
