@@ -5,9 +5,9 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record CourseNoteLine(
-        UUID courseId,
-        String referenceCs,
-        String title,
-        int credits,
-        BigDecimal average,
-        StatutReleve status) {}
+    UUID courseId,
+    String referenceCs,
+    String title,
+    int credits,
+    BigDecimal average,
+    StatutReleve status) {}
