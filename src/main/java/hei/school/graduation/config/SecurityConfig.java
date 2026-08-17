@@ -94,10 +94,10 @@ public class SecurityConfig {
             eh ->
                 eh.authenticationEntryPoint(
                         (req, res, ex) ->
-                            writeJsonError(res, HttpStatus.UNAUTHORIZED, "Non authentifié"))
+                            writeJsonError(res, HttpStatus.UNAUTHORIZED, "Not authenticated"))
                     .accessDeniedHandler(
                         (req, res, ex) ->
-                            writeJsonError(res, HttpStatus.FORBIDDEN, "Accès refusé")))
+                            writeJsonError(res, HttpStatus.FORBIDDEN, "Access denied")))
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
