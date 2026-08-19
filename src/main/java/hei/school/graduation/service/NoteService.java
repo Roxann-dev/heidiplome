@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -34,6 +35,7 @@ public class NoteService {
   private final StudentGroupAssignmentRepository studentGroupAssignmentRepository;
   private final CourseGroupAssignmentRepository courseGroupAssignmentRepository;
 
+  @Transactional
   public NoteEntity saisir(UUID examenId, UUID studentId, BigDecimal valeur, UUID teacherId) {
     ExamEntity exam =
         examRepository
@@ -103,6 +105,7 @@ public class NoteService {
     return noteRepository.save(note);
   }
 
+  @Transactional(readOnly = true)
   public List<NoteEntity> findByExam(UUID examId) {
     if (!examRepository.existsById(examId)) {
       throw new NotFoundException("Exam not found: " + examId);
@@ -110,6 +113,7 @@ public class NoteService {
     return noteRepository.findByExam_Id(examId);
   }
 
+  @Transactional
   public NoteEntity update(UUID noteId, BigDecimal newValue, String reason, UUID modifierId) {
     NoteEntity note =
         noteRepository
@@ -147,6 +151,7 @@ public class NoteService {
     return noteRepository.save(note);
   }
 
+  @Transactional(readOnly = true)
   public List<NoteHistoryEntity> findHistory(UUID noteId) {
     if (!noteRepository.existsById(noteId)) {
       throw new NotFoundException("Note not found: " + noteId);
