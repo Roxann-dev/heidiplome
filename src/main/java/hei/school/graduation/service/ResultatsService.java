@@ -9,6 +9,7 @@ import hei.school.graduation.model.Enum.UserRole;
 import hei.school.graduation.model.ResultatStudent;
 import hei.school.graduation.repository.SemesterRepository;
 import hei.school.graduation.repository.StudentGroupAssignmentRepository;
+import jakarta.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ResultatsService {
 
   private static final int DERNIER_SEMESTRE = 6;
