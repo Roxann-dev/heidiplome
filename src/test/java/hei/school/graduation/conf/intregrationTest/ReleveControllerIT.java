@@ -1,10 +1,14 @@
 package hei.school.graduation.conf.intregrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.Mockito.verify;
 
 import hei.school.graduation.conf.FacadeIT;
 import hei.school.graduation.dto.LoginRequest;
 import hei.school.graduation.dto.LoginResponse;
+import hei.school.graduation.endpoint.event.EventProducer;
+import hei.school.graduation.endpoint.event.model.ReleveGenerationRequested;
 import hei.school.graduation.entity.AcademicGroupEntity;
 import hei.school.graduation.entity.CourseEntity;
 import hei.school.graduation.entity.CourseGroupAssignmentEntity;
@@ -30,6 +34,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -50,6 +55,12 @@ class ReleveControllerIT extends FacadeIT {
   @Autowired private CourseGroupAssignmentRepository courseGroupAssignmentRepository;
   @Autowired private StudentGroupAssignmentRepository studentGroupAssignmentRepository;
   @Autowired private PasswordEncoder passwordEncoder;
+
+  // Mocké pour isoler le test du réel appel réseau AWS EventBridge :
+  // EventProducer résout les credentials/signe la requête uniquement au
+  // moment de l'appel (SDK lazy), donc aucune credential locale ne peut
+  // faire aboutir un vrai putEvents() sans compte AWS ou localstack.
+  @MockBean private EventProducer<ReleveGenerationRequested> eventProducer;
 
   private String adminToken;
   private String studentToken;
@@ -93,9 +104,12 @@ class ReleveControllerIT extends FacadeIT {
         semesterRepository.save(
             SemesterEntity.builder().promotion(promotion).number(1).cursusYear(1).build());
 
+    // Semestre volontairement sur une AUTRE cursusYear que "semester" pour ne pas
+    // polluer le calcul du relevé annuel de l'année 1 (getReleveAnnuel boucle sur
+    // tous les semestres partageant la même cursusYear que celle demandée).
     semesterWithoutAssignment =
         semesterRepository.save(
-            SemesterEntity.builder().promotion(promotion).number(2).cursusYear(1).build());
+            SemesterEntity.builder().promotion(promotion).number(3).cursusYear(2).build());
 
     AcademicGroupEntity group =
         academicGroupRepository.save(
@@ -164,6 +178,8 @@ class ReleveControllerIT extends FacadeIT {
     headers.setBearerAuth(token);
     return new HttpEntity<>(headers);
   }
+
+  // GET /students/{studentId}/releves/semestres/{semestreId}
 
   @Test
   void student_can_view_own_releve_semestre() {
@@ -244,6 +260,8 @@ class ReleveControllerIT extends FacadeIT {
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
+  // GET /students/{studentId}/releves/years/{cursusYear}
+
   @Test
   void student_can_view_own_releve_annuel() {
     ResponseEntity<ReleveAnnuel> response =
@@ -319,6 +337,8 @@ class ReleveControllerIT extends FacadeIT {
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
+  // POST /students/{studentId}/releve-pdf
+
   @Test
   void student_can_trigger_own_releve_pdf_generation() {
     ResponseEntity<Map> response =
@@ -330,6 +350,7 @@ class ReleveControllerIT extends FacadeIT {
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
     Assertions.assertNotNull(response.getBody());
     assertThat(response.getBody()).containsKey("message");
+    verify(eventProducer).accept(anyCollection());
   }
 
   @Test
@@ -341,6 +362,7 @@ class ReleveControllerIT extends FacadeIT {
             Map.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
+    verify(eventProducer).accept(anyCollection());
   }
 
   @Test
