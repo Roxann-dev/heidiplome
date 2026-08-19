@@ -12,7 +12,6 @@ import hei.school.graduation.model.User;
 import hei.school.graduation.repository.UserRepository;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
