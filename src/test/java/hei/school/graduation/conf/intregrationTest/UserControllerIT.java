@@ -12,7 +12,6 @@ import hei.school.graduation.model.User;
 import hei.school.graduation.repository.UserRepository;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +77,6 @@ class UserControllerIT extends FacadeIT {
         restTemplate.postForEntity(
             "/auth/login", new LoginRequest(email, "P@ssw0rd123"), LoginResponse.class);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    Assertions.assertNotNull(response.getBody());
     return response.getBody().accessToken();
   }
 
@@ -156,7 +154,6 @@ class UserControllerIT extends FacadeIT {
             "/users", HttpMethod.POST, authenticated(request, adminToken), User.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    Assertions.assertNotNull(response.getBody());
     assertThat(response.getBody().email()).isEqualTo(request.email());
     assertThat(response.getBody().role()).isEqualTo(UserRole.STUDENT);
   }

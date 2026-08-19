@@ -17,4 +17,6 @@ public interface TeacherCourseAssignmentRepository
       UUID teacherId, UUID courseId, int anneeAcademique);
 
   boolean existsByTeacher_IdAndCourse_Id(UUID teacherId, UUID courseId);
+
+  List<TeacherCourseAssignmentEntity> findByAnneeAcademique(int anneeAcademique);
 }

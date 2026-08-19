@@ -72,6 +72,8 @@ public class TeacherCourseAssignmentService {
               teacherId, anneeAcademique);
     } else if (teacherId != null) {
       entities = teacherCourseAssignmentRepository.findByTeacher_Id(teacherId);
+    } else if (anneeAcademique != null) {
+      entities = teacherCourseAssignmentRepository.findByAnneeAcademique(anneeAcademique);
     } else {
       entities = teacherCourseAssignmentRepository.findAll();
     }
