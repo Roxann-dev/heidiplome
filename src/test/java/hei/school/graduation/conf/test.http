@@ -1,0 +1,122 @@
+@baseUrl = https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws
+@adminToken = eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiI1NTU1NTU1NS01NTU1LTU1NTUtNTU1NS01NTU1NTU1NTU1MDUiLCJzdWIiOiJmYXJhLnJhc29sb0BzY2hvb2wubWciLCJpYXQiOjE3ODcxNzIxNTIsImV4cCI6MTc4NzE3NTc1Mn0.MV7Ly7-YGAnR_4eVGuFR77bztvjs4hKw_AXi5zauSQmOIhdmqE6oaMrD9osULEwev51wU5AePjS46WI0p1DecQ
+@roxannId = 1af9dcf2-014a-4adf-a670-a28ac2e3d8c6
+
+### Login admin
+POST https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws/auth/login
+Content-Type: application/json
+
+{
+  "email": "fara.rasolo@school.mg",
+  "password": "password123"
+}
+
+### Créer un student Roxann
+POST https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiI1NTU1NTU1NS01NTU1LTU1NTUtNTU1NS01NTU1NTU1NTU1MDUiLCJzdWIiOiJmYXJhLnJhc29sb0BzY2hvb2wubWciLCJpYXQiOjE3ODcxNjU2ODcsImV4cCI6MTc4NzE2OTI4N30.pQmrSnYGmwaMM849li8EJZ2VtaYVLyhxFEfw_T_IleFuHNeF2nAaLqqqanmep1_uwbOqCBam7imcIQdjMjjgog
+
+{
+  "reference": "ETU004",
+  "lastName": "Boarlaza",
+  "firstName": "Roxann",
+  "email": "hei.roxann@gmail.com",
+  "password": "password123",
+  "role": "STUDENT"
+}
+
+### Login student Roxann
+POST https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws/auth/login
+Content-Type: application/json
+
+{
+  "email": "hei.roxann@gmail.com",
+  "password": "password123"
+}
+
+### Lister les promotions
+GET https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws/promotions
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiI1NTU1NTU1NS01NTU1LTU1NTUtNTU1NS01NTU1NTU1NTU1MDUiLCJzdWIiOiJmYXJhLnJhc29sb0BzY2hvb2wubWciLCJpYXQiOjE3ODcxNjU2ODcsImV4cCI6MTc4NzE2OTI4N30.pQmrSnYGmwaMM849li8EJZ2VtaYVLyhxFEfw_T_IleFuHNeF2nAaLqqqanmep1_uwbOqCBam7imcIQdjMjjgog
+
+### Lister les semestres
+GET https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws/promotions/11111111-1111-1111-1111-111111111111/semestres
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiI1NTU1NTU1NS01NTU1LTU1NTUtNTU1NS01NTU1NTU1NTU1MDUiLCJzdWIiOiJmYXJhLnJhc29sb0BzY2hvb2wubWciLCJpYXQiOjE3ODcxNjU2ODcsImV4cCI6MTc4NzE2OTI4N30.pQmrSnYGmwaMM849li8EJZ2VtaYVLyhxFEfw_T_IleFuHNeF2nAaLqqqanmep1_uwbOqCBam7imcIQdjMjjgog
+
+### Lister les groupes du S1
+GET https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws/semestres/22222222-2222-2222-2222-222222222201/groups
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiI1NTU1NTU1NS01NTU1LTU1NTUtNTU1NS01NTU1NTU1NTU1MDUiLCJzdWIiOiJmYXJhLnJhc29sb0BzY2hvb2wubWciLCJpYXQiOjE3ODcxNjU2ODcsImV4cCI6MTc4NzE2OTI4N30.pQmrSnYGmwaMM849li8EJZ2VtaYVLyhxFEfw_T_IleFuHNeF2nAaLqqqanmep1_uwbOqCBam7imcIQdjMjjgog
+
+### Assigner Roxann au groupe S1-EL-A
+POST https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws/users/1af9dcf2-014a-4adf-a670-a28ac2e3d8c6/group-assignments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiI1NTU1NTU1NS01NTU1LTU1NTUtNTU1NS01NTU1NTU1NTU1MDUiLCJzdWIiOiJmYXJhLnJhc29sb0BzY2hvb2wubWciLCJpYXQiOjE3ODcxNjU2ODcsImV4cCI6MTc4NzE2OTI4N30.pQmrSnYGmwaMM849li8EJZ2VtaYVLyhxFEfw_T_IleFuHNeF2nAaLqqqanmep1_uwbOqCBam7imcIQdjMjjgog
+
+{
+  "groupId": "33333333-3333-3333-3333-333333333301",
+  "semestreId": "22222222-2222-2222-2222-222222222201",
+  "dateDebut": "2026-01-01"
+}
+
+### Lister les cours du S1
+GET https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws/courses?semestreId=22222222-2222-2222-2222-222222222201
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiI1NTU1NTU1NS01NTU1LTU1NTUtNTU1NS01NTU1NTU1NTU1MDUiLCJzdWIiOiJmYXJhLnJhc29sb0BzY2hvb2wubWciLCJpYXQiOjE3ODcxNjU2ODcsImV4cCI6MTc4NzE2OTI4N30.pQmrSnYGmwaMM849li8EJZ2VtaYVLyhxFEfw_T_IleFuHNeF2nAaLqqqanmep1_uwbOqCBam7imcIQdjMjjgog
+
+### Noter Roxann sur PROG1 (examen existant "99999999-9999-9999-9999-999999999901")
+POST {{baseUrl}}/examens/99999999-9999-9999-9999-999999999901/notes
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "studentId": "{{roxannId}}",
+  "value": 15.5
+}
+
+### Noter Roxann sur MATH1 (examen existant "99999999-9999-9999-9999-999999999905")
+POST {{baseUrl}}/examens/99999999-9999-9999-9999-999999999905/notes
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "studentId": "{{roxannId}}",
+  "value": 12.0
+}
+
+### Noter Roxann sur ANG1 (examen existant "99999999-9999-9999-9999-999999999906")
+POST {{baseUrl}}/examens/99999999-9999-9999-9999-999999999906/notes
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "studentId": "{{roxannId}}",
+  "value": 16.0
+}
+
+### Créer l'examen PROG2 (aucun n'existe encore pour ce cours)
+# @name examProg2
+POST {{baseUrl}}/courses/21e00f3d-01bd-4ada-9ba3-9894ebd639e6/examens
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "examDate": "2026-01-18",
+  "coefficient": 1.00,
+  "type": "NORMAL"
+}
+
+### Lister les examens de PROG2
+GET {{baseUrl}}/courses/21e00f3d-01bd-4ada-9ba3-9894ebd639e6/examens
+Authorization: Bearer {{adminToken}}
+
+### Noter Roxann sur PROG2
+POST {{baseUrl}}/examens/{{examProg2.response.body.id}}/notes
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "studentId": "{{roxannId}}",
+  "value": 14.0
+}
+
+### Déclencher la génération du relevé
+POST https://uw464ok72fw5a4yw55pxmg2hrq0lpxlv.lambda-url.eu-west-3.on.aws/students/55555555-5555-5555-5555-555555555501/releve-pdf
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJyb2xlIjoiQURNSU4iLCJ1c2VySWQiOiI1NTU1NTU1NS01NTU1LTU1NTUtNTU1NS01NTU1NTU1NTU1MDUiLCJzdWIiOiJmYXJhLnJhc29sb0BzY2hvb2wubWciLCJpYXQiOjE3ODcxNzUyNTcsImV4cCI6MTc4NzE3ODg1N30.dVTxd-gxhzBp4niWDfK46nKjDlp3ilqJ7O2cMY3-hE26QCxe6aE7eaQheVJSjC59JmQt1_aXIjLPonLpUv1A4g
