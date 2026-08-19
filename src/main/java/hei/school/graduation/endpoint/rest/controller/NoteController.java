@@ -49,7 +49,7 @@ public class NoteController {
     return noteMapper.toDomain(updated);
   }
 
-  @GetMapping("/notes/{noteId}/historique")
+  @GetMapping(value = "/notes/{noteId}/historique")
   public List<NoteHistory> history(@PathVariable UUID noteId) {
     return noteService.findHistory(noteId).stream().map(noteHistoryMapper::toDomain).toList();
   }
