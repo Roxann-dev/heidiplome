@@ -142,8 +142,6 @@ class ResultatsControllerIT extends FacadeIT {
             .build());
   }
 
-  // GET /promotions/{promotionId}/resultats
-
   @Test
   void admin_can_get_resultats_for_promotion_in_progress() {
     SemesterEntity s1 = saveSemester(1, 1);

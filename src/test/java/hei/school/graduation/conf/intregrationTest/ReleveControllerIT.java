@@ -56,10 +56,6 @@ class ReleveControllerIT extends FacadeIT {
   @Autowired private StudentGroupAssignmentRepository studentGroupAssignmentRepository;
   @Autowired private PasswordEncoder passwordEncoder;
 
-  // Mocké pour isoler le test du réel appel réseau AWS EventBridge :
-  // EventProducer résout les credentials/signe la requête uniquement au
-  // moment de l'appel (SDK lazy), donc aucune credential locale ne peut
-  // faire aboutir un vrai putEvents() sans compte AWS ou localstack.
   @MockBean private EventProducer<ReleveGenerationRequested> eventProducer;
 
   private String adminToken;
