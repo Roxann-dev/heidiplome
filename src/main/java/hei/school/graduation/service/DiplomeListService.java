@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class DiplomeListService {
   private final StudentGroupAssignmentRepository studentGroupAssignmentRepository;
   private final DiplomeEligibilityService diplomeEligibilityService;
 
+  @Transactional(readOnly = true)
   public List<DiplomeEntry> computeDiplomes(UUID promotionId, Parcours parcours) {
     SemesterEntity dernierSemestre =
         semesterRepository
