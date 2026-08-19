@@ -9,6 +9,7 @@ import hei.school.graduation.dto.LoginResponse;
 import hei.school.graduation.entity.CourseEntity;
 import hei.school.graduation.entity.PromotionEntity;
 import hei.school.graduation.entity.SemesterEntity;
+import hei.school.graduation.entity.TeacherCourseAssignmentEntity;
 import hei.school.graduation.entity.UserEntity;
 import hei.school.graduation.model.Enum.ExamType;
 import hei.school.graduation.model.Enum.UserRole;
@@ -17,12 +18,12 @@ import hei.school.graduation.repository.CourseRepository;
 import hei.school.graduation.repository.ExamRepository;
 import hei.school.graduation.repository.PromotionRepository;
 import hei.school.graduation.repository.SemesterRepository;
+import hei.school.graduation.repository.TeacherCourseAssignmentRepository;
 import hei.school.graduation.repository.UserRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +44,11 @@ class ExamControllerIT extends FacadeIT {
   @Autowired private SemesterRepository semesterRepository;
   @Autowired private CourseRepository courseRepository;
   @Autowired private ExamRepository examRepository;
+  @Autowired private TeacherCourseAssignmentRepository teacherCourseAssignmentRepository;
   @Autowired private PasswordEncoder passwordEncoder;
 
   private CourseEntity course;
+  private UUID teacherId;
   private String adminToken;
   private String teacherToken;
   private String studentToken;
@@ -75,14 +78,25 @@ class ExamControllerIT extends FacadeIT {
                 .build());
 
     adminToken = registerAndLogin("admin+" + UUID.randomUUID() + "@school.mg", UserRole.ADMIN);
-    teacherToken =
-        registerAndLogin("teacher+" + UUID.randomUUID() + "@school.mg", UserRole.TEACHER);
+
+    String teacherEmail = "teacher+" + UUID.randomUUID() + "@school.mg";
+    teacherId = createUser(teacherEmail, UserRole.TEACHER);
+    teacherToken = login(teacherEmail);
+
+    teacherCourseAssignmentRepository.save(
+        TeacherCourseAssignmentEntity.builder()
+            .teacher(userRepository.findById(teacherId).orElseThrow())
+            .course(course)
+            .anneeAcademique(2023)
+            .build());
+
     studentToken =
         registerAndLogin("student+" + UUID.randomUUID() + "@school.mg", UserRole.STUDENT);
   }
 
   @AfterEach
   void tearDown() {
+    teacherCourseAssignmentRepository.deleteAll();
     examRepository.deleteAll();
     courseRepository.deleteAll();
     semesterRepository.deleteAll();
@@ -90,7 +104,7 @@ class ExamControllerIT extends FacadeIT {
     userRepository.deleteAll();
   }
 
-  private String registerAndLogin(String email, UserRole role) {
+  private UUID createUser(String email, UserRole role) {
     UserEntity user =
         UserEntity.builder()
             .reference("REF-" + UUID.randomUUID())
@@ -100,13 +114,20 @@ class ExamControllerIT extends FacadeIT {
             .passwordHash(passwordEncoder.encode("P@ssw0rd123"))
             .role(role)
             .build();
-    userRepository.save(user);
+    return userRepository.save(user).getId();
+  }
 
+  private String login(String email) {
     ResponseEntity<LoginResponse> response =
         restTemplate.postForEntity(
             "/auth/login", new LoginRequest(email, "P@ssw0rd123"), LoginResponse.class);
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     return response.getBody().accessToken();
+  }
+
+  private String registerAndLogin(String email, UserRole role) {
+    createUser(email, role);
+    return login(email);
   }
 
   private HttpEntity<Void> authenticatedGet(String token) {
@@ -139,7 +160,7 @@ class ExamControllerIT extends FacadeIT {
   }
 
   @Test
-  void teacher_can_create_exam() {
+  void teacher_can_create_exam_for_assigned_course() {
     ExamCreateRequest request =
         new ExamCreateRequest(LocalDate.of(2026, 1, 15), new BigDecimal("1.00"), ExamType.NORMAL);
 
@@ -151,6 +172,30 @@ class ExamControllerIT extends FacadeIT {
             Exam.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+  }
+
+  @Test
+  void teacher_cannot_create_exam_for_unassigned_course() {
+    CourseEntity otherCourse =
+        courseRepository.save(
+            CourseEntity.builder()
+                .referenceCs("MATH1")
+                .title("Mathematiques 1")
+                .credits(4)
+                .semester(course.getSemester())
+                .build());
+
+    ExamCreateRequest request =
+        new ExamCreateRequest(LocalDate.of(2026, 1, 15), new BigDecimal("1.00"), ExamType.NORMAL);
+
+    ResponseEntity<String> response =
+        restTemplate.exchange(
+            "/courses/" + otherCourse.getId() + "/examens",
+            HttpMethod.POST,
+            authenticated(request, teacherToken),
+            String.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
   }
 
   @Test
