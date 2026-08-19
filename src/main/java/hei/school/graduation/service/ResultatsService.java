@@ -31,7 +31,7 @@ public class ResultatsService {
 
   public List<ResultatStudent> computeResultats(UUID promotionId) {
     List<SemesterEntity> semestres =
-            semesterRepository.findByPromotion_IdOrderByNumberAsc(promotionId);
+        semesterRepository.findByPromotion_IdOrderByNumberAsc(promotionId);
 
     if (semestres.isEmpty()) {
       throw new NotFoundException("Aucun semestre pour la promotion " + promotionId);
@@ -40,16 +40,16 @@ public class ResultatsService {
     boolean cursusTermine = semestres.stream().anyMatch(s -> s.getNumber() == DERNIER_SEMESTRE);
 
     Map<UUID, UserEntity> studentsParId =
-            semestres.stream()
-                    .flatMap(s -> studentGroupAssignmentRepository.findBySemestre_Id(s.getId()).stream())
-                    .map(StudentGroupAssignmentEntity::getStudent)
-                    .filter(s -> s.getRole() == UserRole.STUDENT)
-                    .collect(Collectors.toMap(UserEntity::getId, s -> s, (a, b) -> a));
+        semestres.stream()
+            .flatMap(s -> studentGroupAssignmentRepository.findBySemestre_Id(s.getId()).stream())
+            .map(StudentGroupAssignmentEntity::getStudent)
+            .filter(s -> s.getRole() == UserRole.STUDENT)
+            .collect(Collectors.toMap(UserEntity::getId, s -> s, (a, b) -> a));
 
     return studentsParId.values().stream()
-            .map(student -> toResultat(student, promotionId, cursusTermine))
-            .sorted(Comparator.comparing(ResultatStudent::moyenneCumulee).reversed())
-            .toList();
+        .map(student -> toResultat(student, promotionId, cursusTermine))
+        .sorted(Comparator.comparing(ResultatStudent::moyenneCumulee).reversed())
+        .toList();
   }
 
   private ResultatStudent toResultat(UserEntity student, UUID promotionId, boolean cursusTermine) {
@@ -63,15 +63,15 @@ public class ResultatsService {
     }
 
     var currentAssignment =
-            studentGroupAssignmentRepository.findTopByStudent_IdOrderByDateDebutDesc(student.getId());
+        studentGroupAssignmentRepository.findTopByStudent_IdOrderByDateDebutDesc(student.getId());
 
     return new ResultatStudent(
-            student.getId(),
-            student.getReference(),
-            student.getLastName(),
-            student.getFirstName(),
-            currentAssignment.map(a -> a.getGroup().getParcours()).orElse(null),
-            eligibility.moyenneCumulee(),
-            statut);
+        student.getId(),
+        student.getReference(),
+        student.getLastName(),
+        student.getFirstName(),
+        currentAssignment.map(a -> a.getGroup().getParcours()).orElse(null),
+        eligibility.moyenneCumulee(),
+        statut);
   }
 }
