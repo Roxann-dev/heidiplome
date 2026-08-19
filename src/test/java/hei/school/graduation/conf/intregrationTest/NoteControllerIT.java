@@ -7,21 +7,29 @@ import hei.school.graduation.dto.LoginRequest;
 import hei.school.graduation.dto.LoginResponse;
 import hei.school.graduation.dto.NoteCreateRequest;
 import hei.school.graduation.dto.NoteUpdateRequest;
+import hei.school.graduation.entity.AcademicGroupEntity;
 import hei.school.graduation.entity.CourseEntity;
+import hei.school.graduation.entity.CourseGroupAssignmentEntity;
 import hei.school.graduation.entity.ExamEntity;
 import hei.school.graduation.entity.PromotionEntity;
 import hei.school.graduation.entity.SemesterEntity;
+import hei.school.graduation.entity.StudentGroupAssignmentEntity;
+import hei.school.graduation.entity.TeacherCourseAssignmentEntity;
 import hei.school.graduation.entity.UserEntity;
 import hei.school.graduation.model.Enum.ExamType;
 import hei.school.graduation.model.Enum.UserRole;
 import hei.school.graduation.model.Note;
 import hei.school.graduation.model.NoteHistory;
+import hei.school.graduation.repository.AcademicGroupRepository;
+import hei.school.graduation.repository.CourseGroupAssignmentRepository;
 import hei.school.graduation.repository.CourseRepository;
 import hei.school.graduation.repository.ExamRepository;
 import hei.school.graduation.repository.NoteHistoryRepository;
 import hei.school.graduation.repository.NoteRepository;
 import hei.school.graduation.repository.PromotionRepository;
 import hei.school.graduation.repository.SemesterRepository;
+import hei.school.graduation.repository.StudentGroupAssignmentRepository;
+import hei.school.graduation.repository.TeacherCourseAssignmentRepository;
 import hei.school.graduation.repository.UserRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -49,6 +57,10 @@ class NoteControllerIT extends FacadeIT {
     @Autowired private ExamRepository examRepository;
     @Autowired private NoteRepository noteRepository;
     @Autowired private NoteHistoryRepository noteHistoryRepository;
+    @Autowired private TeacherCourseAssignmentRepository teacherCourseAssignmentRepository;
+    @Autowired private AcademicGroupRepository academicGroupRepository;
+    @Autowired private StudentGroupAssignmentRepository studentGroupAssignmentRepository;
+    @Autowired private CourseGroupAssignmentRepository courseGroupAssignmentRepository;
     @Autowired private PasswordEncoder passwordEncoder;
 
     private ExamEntity exam;
@@ -90,19 +102,54 @@ class NoteControllerIT extends FacadeIT {
                                 .type(ExamType.NORMAL)
                                 .build());
 
+        AcademicGroupEntity group =
+                academicGroupRepository.save(
+                        AcademicGroupEntity.builder()
+                                .reference("S1-A")
+                                .semester(semester)
+                                .build());
+
+        courseGroupAssignmentRepository.save(
+                CourseGroupAssignmentEntity.builder()
+                        .course(course)
+                        .group(group)
+                        .semestre(semester)
+                        .build());
+
         adminToken = registerAndLogin("admin+" + UUID.randomUUID() + "@school.mg", UserRole.ADMIN);
-        teacherToken =
-                registerAndLogin("teacher+" + UUID.randomUUID() + "@school.mg", UserRole.TEACHER);
+
+        String teacherEmail = "teacher+" + UUID.randomUUID() + "@school.mg";
+        UUID teacherId = createUser(teacherEmail, UserRole.TEACHER);
+        teacherToken = login(teacherEmail);
+
+        teacherCourseAssignmentRepository.save(
+                TeacherCourseAssignmentEntity.builder()
+                        .teacher(userRepository.findById(teacherId).orElseThrow())
+                        .course(course)
+                        .anneeAcademique(2023)
+                        .build());
 
         String studentEmail = "student+" + UUID.randomUUID() + "@school.mg";
         studentId = createUser(studentEmail, UserRole.STUDENT);
         studentToken = login(studentEmail);
+
+        studentGroupAssignmentRepository.save(
+                StudentGroupAssignmentEntity.builder()
+                        .student(userRepository.findById(studentId).orElseThrow())
+                        .group(group)
+                        .semestre(semester)
+                        .dateDebut(LocalDate.of(2023, 9, 1))
+                        .build());
     }
 
     @AfterEach
     void tearDown() {
         noteHistoryRepository.deleteAll();
         noteRepository.deleteAll();
+        studentGroupAssignmentRepository.deleteAll();
+        courseGroupAssignmentRepository.deleteAll();
+        teacherCourseAssignmentRepository.deleteAll();
+        academicGroupRepository.deleteAll();
         examRepository.deleteAll();
         courseRepository.deleteAll();
         semesterRepository.deleteAll();
