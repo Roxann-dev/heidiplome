@@ -2,17 +2,43 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Promotions - HEI Diplômés</title>
+    <title>Promotions - HEI Diplomes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        h1 { color: #1a237e; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logout-btn {
+            background-color: #1a237e;
+            color: #f9a825;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .logout-btn:hover { background-color: #0d1642; }
+        table { border-collapse: collapse; width: 100%; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #1a237e; color: #f9a825; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        a { color: #1a237e; text-decoration: none; margin: 0 5px; font-weight: bold; }
+        a:hover { color: #f9a825; text-decoration: underline; }
+    </style>
 </head>
 <body>
-<h1>Liste des promotions</h1>
+<div class="header">
+    <h1>Liste des promotions</h1>
+    <a th:href="@{/logout}" class="logout-btn">Deconnexion</a>
+</div>
 
-<table border="1">
+<table>
     <thead>
     <tr>
         <th>Libellé</th>
         <th>Année d'entrée</th>
-        <th>Diplômés</th>
+        <th>Actions</th>
     </tr>
     </thead>
     <tbody>
@@ -20,12 +46,20 @@
         <td th:text="${promotion.label}">Promotion 2023</td>
         <td th:text="${promotion.entryYear}">2023</td>
         <td>
-            <a th:href="@{/promotions/{id}/diplomes/export(id=${promotion.id}, parcours='EL')}">
-                Télécharger EL
+            <a th:href="@{/promotions/{id}/diplomes(id=${promotion.id}, parcours='EL')}" target="_blank">
+                Voir EL
             </a>
             |
-            <a th:href="@{/promotions/{id}/diplomes/export(id=${promotion.id}, parcours='TN')}">
-                Télécharger TN
+            <a th:href="@{/promotions/{id}/diplomes/export(id=${promotion.id}, parcours='EL')}" target="_blank">
+                Export EL
+            </a>
+            |
+            <a th:href="@{/promotions/{id}/diplomes(id=${promotion.id}, parcours='TN')}" target="_blank">
+                Voir TN
+            </a>
+            |
+            <a th:href="@{/promotions/{id}/diplomes/export(id=${promotion.id}, parcours='TN')}" target="_blank">
+                Export TN
             </a>
         </td>
     </tr>
