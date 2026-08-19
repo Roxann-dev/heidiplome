@@ -15,6 +15,7 @@ import hei.school.graduation.repository.StudentGroupAssignmentRepository;
 import hei.school.graduation.security.UserPrincipal;
 import hei.school.graduation.service.calculator.AnnualAverageCalculator;
 import hei.school.graduation.service.calculator.CourseAverageCalculator;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReleveService {
 
   private final StudentGroupAssignmentRepository studentGroupAssignmentRepository;
