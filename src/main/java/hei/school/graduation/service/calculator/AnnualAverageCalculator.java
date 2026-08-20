@@ -42,7 +42,7 @@ public class AnnualAverageCalculator {
 
     for (SemesterEntity semestre : semestres) {
       List<UUID> courseIds =
-              groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, semestre.getId());
+          groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, semestre.getId());
 
       if (courseIds.isEmpty()) {
         complet = false;
