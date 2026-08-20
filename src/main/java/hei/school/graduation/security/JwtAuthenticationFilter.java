@@ -2,6 +2,7 @@ package hei.school.graduation.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private static final String HEADER = "Authorization";
   private static final String PREFIX = "Bearer ";
+  private static final String COOKIE_NAME = "jwt_token";
 
   private final JwtService jwtService;
   private final CustomUserDetailsService userDetailsService;
@@ -31,14 +33,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
 
-    String authHeader = request.getHeader(HEADER);
+    String token = extractToken(request);
 
-    if (authHeader == null || !authHeader.startsWith(PREFIX)) {
+    if (token == null) {
       filterChain.doFilter(request, response);
       return;
     }
 
-    String token = authHeader.substring(PREFIX.length());
     String username = jwtService.extractUsername(token);
 
     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -54,5 +55,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     filterChain.doFilter(request, response);
+  }
+
+  private String extractToken(HttpServletRequest request) {
+    String authHeader = request.getHeader(HEADER);
+    if (authHeader != null && authHeader.startsWith(PREFIX)) {
+      return authHeader.substring(PREFIX.length());
+    }
+
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (COOKIE_NAME.equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
+    }
+
+    return null;
   }
 }
