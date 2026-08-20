@@ -156,7 +156,7 @@ class AnnualAverageCalculatorTest {
 
     assertThat(result.moyenneGenerale()).isEqualByComparingTo("0.00");
     assertThat(result.totalCredits()).isZero();
-    assertThat(result.complet()).isTrue();
+    assertThat(result.complet()).isFalse();
   }
 
   @Test

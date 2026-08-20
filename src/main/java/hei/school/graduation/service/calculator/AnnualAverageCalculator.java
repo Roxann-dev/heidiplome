@@ -45,6 +45,7 @@ public class AnnualAverageCalculator {
           groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, semestre.getId());
 
       if (courseIds.isEmpty()) {
+        complet = false;
         continue;
       }
 
