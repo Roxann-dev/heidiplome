@@ -45,80 +45,80 @@ public class SecurityConfig {
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-          throws Exception {
+      throws Exception {
     return config.getAuthenticationManager();
   }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(
-                    auth ->
-                            auth.requestMatchers("/auth/**")
-                                    .permitAll()
-                                    .requestMatchers("/login", "/logout")
-                                    .permitAll()
-                                    .requestMatchers(HttpMethod.GET, "/promotions/**")
-                                    .hasRole("ADMIN")
-                                    .requestMatchers("/promotions-view")
-                                    .hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.GET, "/groups/*/students")
-                                    .hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.POST, "/semestres/*/groups")
-                                    .hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.POST, "/courses")
-                                    .hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.POST, "/courses/*/groups")
-                                    .hasRole("ADMIN")
-                                    .requestMatchers("/users/**")
-                                    .hasRole("ADMIN")
-                                    .requestMatchers("/teacher-course-assignments/**")
-                                    .hasRole("ADMIN")
-                                    .requestMatchers(HttpMethod.POST, "/courses/*/examens")
-                                    .hasAnyRole("ADMIN", "TEACHER")
-                                    .requestMatchers(HttpMethod.GET, "/examens/*/notes")
-                                    .hasAnyRole("ADMIN", "TEACHER")
-                                    .requestMatchers(HttpMethod.POST, "/examens/*/notes")
-                                    .hasAnyRole("ADMIN", "TEACHER")
-                                    .requestMatchers(HttpMethod.PATCH, "/notes/*")
-                                    .hasAnyRole("ADMIN", "TEACHER")
-                                    .requestMatchers(HttpMethod.GET, "/courses/**")
-                                    .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
-                                    .requestMatchers(HttpMethod.GET, "/notes/*/historique")
-                                    .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
-                                    .requestMatchers(HttpMethod.GET, "/students/*/releves/**")
-                                    .hasAnyRole("ADMIN", "STUDENT")
-                                    .requestMatchers(HttpMethod.POST, "/students/*/releve-pdf")
-                                    .hasAnyRole("ADMIN", "STUDENT")
-                                    .anyRequest()
-                                    .authenticated())
-            .authenticationProvider(authenticationProvider())
-            .exceptionHandling(
-                    eh ->
-                            eh.authenticationEntryPoint(
-                                            (req, res, ex) ->
-                                                    writeJsonError(res, HttpStatus.UNAUTHORIZED, "Not authenticated"))
-                                    .accessDeniedHandler(
-                                            (req, res, ex) ->
-                                                    writeJsonError(res, HttpStatus.FORBIDDEN, "Access denied")))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/auth/**")
+                    .permitAll()
+                    .requestMatchers("/login", "/logout")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/promotions/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/promotions-view")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/groups/*/students")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/semestres/*/groups")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/courses")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/courses/*/groups")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/users/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers("/teacher-course-assignments/**")
+                    .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/courses/*/examens")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.GET, "/examens/*/notes")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.POST, "/examens/*/notes")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.PATCH, "/notes/*")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.GET, "/courses/**")
+                    .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
+                    .requestMatchers(HttpMethod.GET, "/notes/*/historique")
+                    .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
+                    .requestMatchers(HttpMethod.GET, "/students/*/releves/**")
+                    .hasAnyRole("ADMIN", "STUDENT")
+                    .requestMatchers(HttpMethod.POST, "/students/*/releve-pdf")
+                    .hasAnyRole("ADMIN", "STUDENT")
+                    .anyRequest()
+                    .authenticated())
+        .authenticationProvider(authenticationProvider())
+        .exceptionHandling(
+            eh ->
+                eh.authenticationEntryPoint(
+                        (req, res, ex) ->
+                            writeJsonError(res, HttpStatus.UNAUTHORIZED, "Not authenticated"))
+                    .accessDeniedHandler(
+                        (req, res, ex) ->
+                            writeJsonError(res, HttpStatus.FORBIDDEN, "Access denied")))
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
 
   private void writeJsonError(
-          jakarta.servlet.http.HttpServletResponse response, HttpStatus status, String message)
-          throws java.io.IOException {
+      jakarta.servlet.http.HttpServletResponse response, HttpStatus status, String message)
+      throws java.io.IOException {
     response.setStatus(status.value());
     response.setContentType("application/json");
     response
-            .getWriter()
-            .write(
-                    objectMapper.writeValueAsString(
-                            Map.of(
-                                    "status", status.value(),
-                                    "message", message,
-                                    "timestamp", java.time.LocalDateTime.now().toString())));
+        .getWriter()
+        .write(
+            objectMapper.writeValueAsString(
+                Map.of(
+                    "status", status.value(),
+                    "message", message,
+                    "timestamp", java.time.LocalDateTime.now().toString())));
   }
 }

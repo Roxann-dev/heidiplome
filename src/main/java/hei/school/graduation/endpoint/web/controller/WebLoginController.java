@@ -6,14 +6,14 @@ import hei.school.graduation.security.UserPrincipal;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 
 @Controller
 @RequiredArgsConstructor
@@ -36,18 +36,14 @@ public class WebLoginController {
 
   @PostMapping("/login")
   public String login(
-      @RequestParam String email,
-      @RequestParam String password,
-      HttpServletResponse response) {
+      @RequestParam String email, @RequestParam String password, HttpServletResponse response) {
     try {
-      authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(email, password));
+      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
     } catch (AuthenticationException e) {
       return "redirect:/login?error";
     }
 
-    UserPrincipal principal =
-        (UserPrincipal) userDetailsService.loadUserByUsername(email);
+    UserPrincipal principal = (UserPrincipal) userDetailsService.loadUserByUsername(email);
     String token = jwtService.generateToken(principal);
 
     Cookie cookie = new Cookie(JWT_COOKIE_NAME, token);
