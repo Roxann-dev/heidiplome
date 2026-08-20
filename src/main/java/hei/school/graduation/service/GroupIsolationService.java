@@ -6,6 +6,7 @@ import hei.school.graduation.exception.NotFoundException;
 import hei.school.graduation.repository.CourseGroupAssignmentRepository;
 import hei.school.graduation.repository.StudentGroupAssignmentRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,24 @@ public class GroupIsolationService {
         .stream()
         .map(cga -> cga.getCourse().getId())
         .collect(Collectors.toList());
+  }
+
+  public Optional<UUID> resolveGroupIdIfPresent(UUID studentId, UUID semestreId) {
+    return studentGroupAssignmentRepository
+        .findByStudent_IdAndSemestre_Id(studentId, semestreId)
+        .map(assignment -> assignment.getGroup().getId());
+  }
+
+  public List<UUID> resolveFollowedCourseIdsIfAssigned(UUID studentId, UUID semestreId) {
+    return resolveGroupIdIfPresent(studentId, semestreId)
+        .map(
+            groupId ->
+                courseGroupAssignmentRepository
+                    .findByGroup_IdAndSemestre_Id(groupId, semestreId)
+                    .stream()
+                    .map(cga -> cga.getCourse().getId())
+                    .collect(Collectors.toList()))
+        .orElse(List.of());
   }
 
   public void checkStudentFollowsCourse(UUID studentId, UUID courseId, UUID semestreId) {

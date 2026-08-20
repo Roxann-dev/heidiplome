@@ -42,7 +42,11 @@ public class AnnualAverageCalculator {
 
     for (SemesterEntity semestre : semestres) {
       List<UUID> courseIds =
-          groupIsolationService.resolveFollowedCourseIds(studentId, semestre.getId());
+          groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, semestre.getId());
+
+      if (courseIds.isEmpty()) {
+        continue;
+      }
 
       for (UUID courseId : courseIds) {
         var result = courseAverageCalculator.compute(courseId, studentId);

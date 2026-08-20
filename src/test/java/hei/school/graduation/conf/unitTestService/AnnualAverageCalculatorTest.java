@@ -85,9 +85,9 @@ class AnnualAverageCalculatorTest {
     UUID course1 = UUID.randomUUID();
     UUID course2 = UUID.randomUUID();
 
-    when(groupIsolationService.resolveFollowedCourseIds(studentId, s1Id))
+    when(groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, s1Id))
         .thenReturn(List.of(course1));
-    when(groupIsolationService.resolveFollowedCourseIds(studentId, s2Id))
+    when(groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, s2Id))
         .thenReturn(List.of(course2));
 
     when(courseAverageCalculator.compute(course1, studentId))
@@ -122,7 +122,7 @@ class AnnualAverageCalculatorTest {
     UUID courseComplet = UUID.randomUUID();
     UUID courseProvisoire = UUID.randomUUID();
 
-    when(groupIsolationService.resolveFollowedCourseIds(studentId, s1Id))
+    when(groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, s1Id))
         .thenReturn(List.of(courseComplet, courseProvisoire));
 
     when(courseAverageCalculator.compute(courseComplet, studentId))
@@ -149,7 +149,8 @@ class AnnualAverageCalculatorTest {
     UUID s1Id = UUID.randomUUID();
     when(semestreRepository.findByPromotion_IdAndCursusYear(promotionId, anneeCursus))
         .thenReturn(List.of(semestre(s1Id)));
-    when(groupIsolationService.resolveFollowedCourseIds(studentId, s1Id)).thenReturn(List.of());
+    when(groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, s1Id))
+        .thenReturn(List.of());
 
     var result = calculator.compute(studentId, anneeCursus);
 
@@ -170,7 +171,7 @@ class AnnualAverageCalculatorTest {
     UUID courseB = UUID.randomUUID();
     UUID courseC = UUID.randomUUID();
 
-    when(groupIsolationService.resolveFollowedCourseIds(studentId, s1Id))
+    when(groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, s1Id))
         .thenReturn(List.of(courseA, courseB, courseC));
 
     when(courseAverageCalculator.compute(courseA, studentId))
