@@ -38,7 +38,7 @@
     <tr>
         <th>Libellé</th>
         <th>Année d'entrée</th>
-        <th>Actions</th>
+        <th>Diplomés</th>
     </tr>
     </thead>
     <tbody>
@@ -46,7 +46,7 @@
         <td th:text="${promotion.label}">Promotion 2023</td>
         <td th:text="${promotion.entryYear}">2023</td>
         <td>
-            <a th:href="@{/promotions/{id}/diplomes(id=${promotion.id}, parcours='EL')}" target="_blank">
+            <a th:href="@{/promotions/{id}/diplomes/view(id=${promotion.id}, parcours='EL')}" target="_blank">
                 Voir EL
             </a>
             |
@@ -54,12 +54,24 @@
                 Export EL
             </a>
             |
-            <a th:href="@{/promotions/{id}/diplomes(id=${promotion.id}, parcours='TN')}" target="_blank">
+            <a th:href="@{/promotions/{id}/diplomes/view(id=${promotion.id}, parcours='TN')}" target="_blank">
                 Voir TN
             </a>
             |
             <a th:href="@{/promotions/{id}/diplomes/export(id=${promotion.id}, parcours='TN')}" target="_blank">
                 Export TN
+            </a>
+            |
+            <a th:href="@{/promotions/{id}/diplomes/export(id=${promotion.id}, parcours='EL')}" target="_blank">
+                Télécharger EL
+            </a>
+            |
+            <a th:href="@{/promotions/{id}/diplomes(id=${promotion.id}, parcours='TN')}" target="_blank">
+                Voir TN
+            </a>
+            |
+            <a th:href="@{/promotions/{id}/diplomes/export(id=${promotion.id}, parcours='TN')}" target="_blank">
+                Télécharger TN
             </a>
         </td>
     </tr>
