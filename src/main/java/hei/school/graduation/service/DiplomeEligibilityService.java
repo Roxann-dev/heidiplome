@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class DiplomeEligibilityService {
 
   public record EligibilityResult(boolean diplome, BigDecimal moyenneCumulee) {}
 
+  @Transactional(readOnly = true)
   public EligibilityResult evaluate(UUID studentId, UUID promotionId) {
     List<SemesterEntity> semesters =
         semesterRepository.findByPromotion_IdOrderByNumberAsc(promotionId);

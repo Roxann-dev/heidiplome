@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class AnnualAverageCalculator {
   public record AnnualAverageResult(
       BigDecimal moyenneGenerale, int totalCredits, boolean complet) {}
 
+  @Transactional(readOnly = true)
   public AnnualAverageResult compute(UUID studentId, int anneeCursus) {
     UUID promotionId = resolvePromotionId(studentId);
     List<SemesterEntity> semestres =
@@ -40,7 +42,12 @@ public class AnnualAverageCalculator {
 
     for (SemesterEntity semestre : semestres) {
       List<UUID> courseIds =
-          groupIsolationService.resolveFollowedCourseIds(studentId, semestre.getId());
+          groupIsolationService.resolveFollowedCourseIdsIfAssigned(studentId, semestre.getId());
+
+      if (courseIds.isEmpty()) {
+        complet = false;
+        continue;
+      }
 
       for (UUID courseId : courseIds) {
         var result = courseAverageCalculator.compute(courseId, studentId);
@@ -53,7 +60,7 @@ public class AnnualAverageCalculator {
         CourseEntity course =
             courseRepository
                 .findById(courseId)
-                .orElseThrow(() -> new NotFoundException("Course not found: " + courseId));
+                .orElseThrow(() -> new NotFoundException("Course introuvable : " + courseId));
 
         sommePonderee =
             sommePonderee.add(result.moyenne().multiply(BigDecimal.valueOf(course.getCredits())));
@@ -74,7 +81,8 @@ public class AnnualAverageCalculator {
         studentGroupAssignmentRepository.findByStudent_IdOrderByDateDebutAsc(studentId).stream()
             .findFirst()
             .orElseThrow(
-                () -> new NotFoundException("No group assignment found for student " + studentId));
+                () ->
+                    new NotFoundException("Aucune affectation de group pour student " + studentId));
     return anyAssignment.getSemestre().getPromotion().getId();
   }
 }
